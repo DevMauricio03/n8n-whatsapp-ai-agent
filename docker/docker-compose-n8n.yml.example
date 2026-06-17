@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+
+    restart: always
+
+    ports:
+      - "5678:5678"
+
+    environment:
+      - N8N_HOST=<N8N_DOMAIN>
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://<N8N_DOMAIN>/
+      - N8N_SECURE_COOKIE=true
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+    networks:
+      - platform_net
+
+volumes:
+  n8n_data:
+
+networks:
+  platform_net:
+    external: true

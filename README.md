@@ -65,6 +65,19 @@ Documentos disponibles:
 - instalacion.md
 - credenciales.md
 
+## Archivos de Infraestructura
+
+La carpeta `docker/` contiene ejemplos de configuración para desplegar los principales componentes de la plataforma.
+
+Archivos disponibles:
+
+- docker-compose-postgres-redis.yml.example
+- docker-compose-n8n.yml.example
+- docker-compose-chatwoot.yml.example
+- Caddyfile.example
+
+Estos archivos son plantillas reutilizables y no contienen credenciales reales ni configuraciones sensibles.
+
 ## Objetivo
 
 Documentar la arquitectura, instalación, despliegue y funcionamiento de la plataforma para facilitar su mantenimiento, transferencia de conocimiento y futuras implementaciones.

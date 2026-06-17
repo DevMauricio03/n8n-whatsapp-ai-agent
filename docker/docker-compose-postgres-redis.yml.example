@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: postgres
+
+    environment:
+      POSTGRES_USER: <POSTGRES_USER>
+      POSTGRES_PASSWORD: <POSTGRES_PASSWORD>
+      POSTGRES_DB: <POSTGRES_DB>
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    restart: always
+
+    networks:
+      - platform_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+
+    volumes:
+      - redis_data:/data
+
+    restart: always
+
+    networks:
+      - platform_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  platform_net:
+    driver: bridge

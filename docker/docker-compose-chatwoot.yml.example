@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+
+  rails:
+    image: chatwoot/chatwoot:latest
+
+    restart: always
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      - NODE_ENV=production
+      - RAILS_ENV=production
+      - INSTALLATION_ENV=docker
+
+    volumes:
+      - storage_data:/app/storage
+
+    networks:
+      - platform_net
+
+  sidekiq:
+    image: chatwoot/chatwoot:latest
+
+    restart: always
+
+    environment:
+      - NODE_ENV=production
+      - RAILS_ENV=production
+      - INSTALLATION_ENV=docker
+
+    networks:
+      - platform_net
+
+volumes:
+  storage_data:
+
+networks:
+  platform_net:
+    external: true
