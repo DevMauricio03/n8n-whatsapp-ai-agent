@@ -1,0 +1,22 @@
+# Variables de entorno
+.env
+.env.*
+
+# Archivos de respaldo
+*.bak
+*.backup
+
+# Archivos temporales
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Exportaciones temporales
+exports/
+
+# Archivos comprimidos
+*.zip
+*.rar
+*.7z
