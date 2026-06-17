@@ -63,6 +63,7 @@ Documentos disponibles:
 - base-de-datos.md
 - despliegue.md
 - instalacion.md
+- credenciales.md
 
 ## Objetivo
 
