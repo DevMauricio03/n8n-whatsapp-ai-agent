@@ -30,7 +30,7 @@ flowchart TB
 ## Flujo de un mensaje
 
 ```mermaid
-%%{init: { "flowchart": { "defaultRenderer": "elk", "curve": "basis" }, "themeVariables": { "fontSize": "13px" }}}%%
+%%{init: { "flowchart": { "defaultRenderer": "elk", "curve": "basis", "useMaxWidth": true }, "themeVariables": { "fontSize": "13px", "primaryColor": "#1f2937", "primaryTextColor": "#ffffff", "primaryBorderColor": "#4b5563", "lineColor": "#4b5563", "secondBkgColor": "#1f2937", "tertiaryColor": "#1f2937", "tertiaryTextColor": "#ffffff", "tertiaryBorderColor": "#4b5563", "background": "#1f2937", "mainBkg": "#1f2937", "secondBkg": "#1f2937", "clusterBkg": "#1f2937" }, "theme": "dark" }}}%%
 flowchart LR
 
 %% SECCIONES HORIZONTALES
