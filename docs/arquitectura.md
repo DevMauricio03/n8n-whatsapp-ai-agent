@@ -30,7 +30,7 @@ flowchart TB
 ## Flujo de un mensaje
 
 ```mermaid
-%%{init: { "flowchart": { "defaultRenderer": "elk", "curve": "basis", "useMaxWidth": true }, "themeVariables": { "fontSize": "13px", "primaryColor": "#1f2937", "primaryTextColor": "#ffffff", "primaryBorderColor": "#4b5563", "lineColor": "#4b5563", "secondBkgColor": "#1f2937", "tertiaryColor": "#1f2937", "tertiaryTextColor": "#ffffff", "tertiaryBorderColor": "#4b5563", "background": "#1f2937", "mainBkg": "#1f2937", "secondBkg": "#1f2937", "clusterBkg": "#1f2937" }, "theme": "dark" }}}%%
+%%{init: { "flowchart": { "defaultRenderer": "elk", "curve": "basis" }, "themeVariables": { "fontSize": "13px", "primaryColor": "#111827", "primaryTextColor": "#ffffff", "primaryBorderColor": "#374151", "lineColor": "#4b5563", "secondBkgColor": "#111827", "tertiaryColor": "#111827", "tertiaryTextColor": "#ffffff", "tertiaryBorderColor": "#374151", "background": "#111827", "mainBkg": "#111827", "secondBkg": "#111827", "clusterBkg": "#111827", "clusterBorder": "#374151", "edgeLabelBackground":"#111827" }, "theme": "dark" }}}%%
 flowchart LR
 
 %% SECCIONES HORIZONTALES
@@ -97,10 +97,10 @@ E1 --> E2 --> E3
 B3 -. "Expira TTL (30 min)\n o se desactiva manualmente" .-> B4
 
 %% ESTILOS
-classDef green stroke:#4ade80,fill:#f0fdf4;
-classDef blue stroke:#38bdf8,fill:#f0f9ff;
-classDef orange stroke:#fb923c,fill:#fff7ed;
-classDef gray stroke:#6b7280,fill:#f9fafb;
+classDef green stroke:#4ade80,fill:#064e3b,color:#ffffff;
+classDef blue stroke:#38bdf8,fill:#0c2d48,color:#ffffff;
+classDef orange stroke:#fb923c,fill:#5a2e0f,color:#ffffff;
+classDef gray stroke:#6b7280,fill:#1f2937,color:#ffffff;
 ```
 
 ## Capas
