@@ -1,77 +1,93 @@
-# Arquitectura del Sistema
+# Arquitectura del sistema
 
-## Arquitectura General
+## Vista general
 
-```text
-Cliente
-↓
-WhatsApp Cloud API
-↓
-Chatwoot
-↓
-Webhook n8n
-↓
-Validación de mensajes entrantes
-↓
-Control de Human Handoff (Redis)
-↓
-Extracción de datos del mensaje
-↓
-Clasificación de mensaje (Texto / Audio)
-↓
-Transcripción de audio (OpenAI Whisper)
-↓
-Buffer conversacional (Redis)
-↓
-Agrupación de mensajes
-↓
-Validación de horario de atención
-↓
-AI Agent
-├── OpenAI
-├── Memoria Conversacional (PostgreSQL)
-└── Herramienta de consulta de datos
-↓
-Clasificación de respuestas
-↓
-Envío de imágenes informativas o mensajes
-↓
-WhatsApp Cloud API
-↓
-Cliente
+```mermaid
+flowchart TB
+    Client[Cliente de WhatsApp]
+    Meta[WhatsApp Cloud API]
+    Chatwoot[Chatwoot]
+    Caddy[Caddy HTTPS]
+    N8N[n8n]
+    OpenAI[OpenAI]
+    Postgres[(PostgreSQL)]
+    Redis[(Redis)]
+    Drive[Google Drive]
+    Agent[Agente humano]
+
+    Client <--> Meta
+    Meta <--> Chatwoot
+    Agent <--> Chatwoot
+    Chatwoot -->|Webhook| Caddy
+    Caddy --> N8N
+    N8N <--> OpenAI
+    N8N <--> Postgres
+    N8N <--> Redis
+    Drive --> N8N
+    N8N --> Meta
 ```
-## Descripción General
 
-La plataforma utiliza una arquitectura basada en eventos donde los mensajes recibidos desde WhatsApp son procesados mediante n8n.
+## Flujo de un mensaje
 
-Antes de ser enviados al agente de Inteligencia Artificial, los mensajes pasan por mecanismos de control que permiten gestionar conversaciones humanas, consolidar múltiples mensajes enviados en intervalos cortos de tiempo, procesar mensajes de voz y validar horarios de atención.
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant W as WhatsApp
+    participant CW as Chatwoot
+    participant N as n8n
+    participant R as Redis
+    participant P as PostgreSQL
+    participant AI as OpenAI
 
-El agente utiliza OpenAI para generar respuestas contextuales, PostgreSQL para almacenar memoria conversacional e información estructurada, y Redis para la gestión de estados temporales y buffers conversacionales.
+    C->>W: Envía texto o audio
+    W->>CW: Entrega el mensaje
+    CW->>N: Webhook
+    N->>R: Consulta Human Handoff
+    alt Atención humana activa
+        N-->>N: Detiene automatización
+    else Automatización disponible
+        N->>R: Agrega mensaje al buffer
+        N->>N: Agrupa y valida horario
+        opt Mensaje de audio
+            N->>AI: Solicita transcripción
+            AI-->>N: Texto transcrito
+        end
+        N->>AI: Envía mensaje y contexto
+        AI->>P: Consulta por herramienta si necesita datos
+        P-->>AI: Devuelve registros
+        AI-->>N: Respuesta o clave de contenido
+        N->>W: Envía texto o imagen
+        W-->>C: Entrega la respuesta
+    end
+```
 
-Finalmente, las respuestas son enviadas nuevamente al cliente mediante WhatsApp Cloud API.
+## Capas
 
-## Componentes Principales
+| Capa | Componentes | Responsabilidad |
+|---|---|---|
+| Canal | WhatsApp Cloud API | Entrada y salida de mensajes |
+| Atención | Chatwoot | Bandeja, contactos y agentes humanos |
+| Orquestación | n8n | Reglas, integraciones y agente de IA |
+| Inteligencia | OpenAI | Transcripción y generación de respuestas |
+| Persistencia | PostgreSQL | Datos empresariales y memoria |
+| Estado temporal | Redis | Buffer, bloqueo humano y coordinación |
+| Fuente de datos | Google Drive | Archivo que alimenta `bd_clientes` |
+| Exposición | Caddy | HTTPS y reverse proxy |
 
-### WhatsApp Cloud API
+## Red y exposición
 
-Canal principal de comunicación utilizado para recibir y enviar mensajes a los clientes.
+Todos los contenedores pertenecen a `platform_net`. Solo Caddy publica puertos:
 
-### Chatwoot
+- `80/tcp` para redirección y validación de certificados;
+- `443/tcp` para HTTPS;
+- `443/udp` para HTTP/3 cuando esté disponible.
 
-Plataforma utilizada para centralizar conversaciones y permitir la intervención de agentes humanos cuando sea necesario.
+PostgreSQL, Redis, n8n y Chatwoot no deben publicar puertos directamente en producción.
 
-### n8n
+## Decisiones y límites
 
-Motor de automatización encargado de coordinar todos los procesos de negocio y comunicación.
-
-### OpenAI
-
-Proveedor de Inteligencia Artificial utilizado para la generación de respuestas y procesamiento de lenguaje natural.
-
-### PostgreSQL
-
-Base de datos utilizada para memoria conversacional y almacenamiento de información estructurada.
-
-### Redis
-
-Sistema de almacenamiento en memoria utilizado para buffers conversacionales, control de estados y handoff humano.
+- PostgreSQL aloja tres bases: `n8n`, `chatwoot` y `agent`.
+- La plantilla usa un usuario de PostgreSQL para simplificar el despliegue. En un entorno de mayor riesgo deben crearse usuarios separados y privilegios mínimos.
+- Redis usa contraseña y persistencia AOF, pero no sustituye a un sistema de colas duradero.
+- El workflow depende de la estructura del webhook de Chatwoot. Una actualización del proveedor debe probarse antes de producción.
+- Las imágenes Docker se parametrizan para facilitar actualizaciones controladas.

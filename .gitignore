@@ -1,6 +1,7 @@
 # Variables de entorno
 .env
 .env.*
+!.env.example
 
 # Archivos de respaldo
 *.bak
@@ -15,6 +16,7 @@ Thumbs.db
 
 # Exportaciones temporales
 exports/
+backups/
 
 # Archivos comprimidos
 *.zip

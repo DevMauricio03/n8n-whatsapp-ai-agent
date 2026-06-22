@@ -1,83 +1,110 @@
- # Plataforma de Atención Automatizada con WhatsApp, IA y n8n
+# Plataforma de atención automatizada con WhatsApp, IA y n8n
 
-## Descripción
+Documentación técnica y operativa de una plataforma que recibe conversaciones de WhatsApp, permite intervención humana desde Chatwoot y automatiza respuestas mediante n8n, OpenAI, PostgreSQL y Redis.
 
-Este repositorio contiene la documentación técnica de una plataforma de atención automatizada desarrollada durante el proyecto de estadía profesional.
+El repositorio se originó como parte de un proyecto de estadía profesional y está preparado para facilitar mantenimiento, transferencia de conocimiento y futuras implementaciones.
 
-La solución integra WhatsApp Cloud API, Chatwoot, n8n, OpenAI, PostgreSQL y Redis para gestionar conversaciones, consultar información empresarial y proporcionar respuestas inteligentes mediante Inteligencia Artificial.
+> [!IMPORTANT]
+> Este repositorio contiene plantillas y un workflow de ejemplo saneado. Antes de usarlo en producción debes configurar credenciales, dominios, políticas de privacidad y versiones de imágenes validadas.
 
-La plataforma fue diseñada para automatizar procesos de atención al cliente, reducir tiempos de respuesta y centralizar la comunicación mediante canales digitales.
+![Vista general del workflow](images/flujoCompleto.png)
 
-## Tecnologías Utilizadas
+## Funciones principales
 
-- WhatsApp Cloud API
-- Chatwoot
-- n8n
-- OpenAI
-- PostgreSQL
-- Redis
-- Docker
-- Docker Compose
-- Caddy
-- Ubuntu Server 24.04 LTS
+- Recepción y envío de mensajes mediante WhatsApp Cloud API.
+- Gestión de conversaciones y atención humana mediante Chatwoot.
+- Procesamiento de texto y notas de voz.
+- Buffer de mensajes y Human Handoff mediante Redis.
+- Respuestas asistidas por IA y memoria conversacional.
+- Consulta y sincronización de datos empresariales en PostgreSQL.
+- Despliegue con Docker Compose y HTTPS mediante Caddy.
 
-## Arquitectura General
+## Arquitectura
 
-```text
-Cliente
-│
-▼
-WhatsApp
-│
-▼
-WhatsApp Cloud API
-│
-▼
-Chatwoot
-│
-▼
-n8n
-│
-├── OpenAI
-├── PostgreSQL
-└── Redis
-│
-▼
-Respuesta al Cliente
+```mermaid
+flowchart LR
+    U[Cliente] --> WA[WhatsApp Cloud API]
+    WA --> CW[Chatwoot]
+    CW --> N8N[n8n]
+    N8N --> AI[OpenAI]
+    N8N --> PG[(PostgreSQL)]
+    N8N --> RD[(Redis)]
+    N8N --> GD[Google Drive]
+    N8N --> WA
 ```
+
+Consulta la explicación completa en [Arquitectura](docs/arquitectura.md).
+
+## Inicio rápido
+
+Requisitos:
+
+- VPS con Ubuntu Server 24.04 LTS o distribución compatible.
+- Docker Engine y Docker Compose v2.
+- Dos dominios apuntando al servidor.
+- Cuentas de WhatsApp Cloud API, OpenAI y Google Drive.
+
+```bash
+cp .env.example .env
+cp docker/docker-compose.yml.example docker/docker-compose.yml
+```
+
+Después:
+
+1. Reemplaza todos los valores `CHANGE_ME` de `.env`.
+2. Revisa las versiones de imágenes y prueba la actualización en un entorno no productivo.
+3. Desde la raíz, valida con `docker compose --env-file .env -f docker/docker-compose.yml config`.
+4. Inicia con `docker compose --env-file .env -f docker/docker-compose.yml up -d`.
+5. Importa [el workflow saneado](workflows/atencion-whatsapp-principal.example.json).
+6. Crea y asigna las credenciales dentro de n8n.
+7. Ejecuta el [plan de pruebas](docs/pruebas.md) antes de activar el workflow.
+
+La guía detallada está en [Instalación](docs/instalacion.md).
 
 ## Documentación
 
-La documentación del proyecto se encuentra organizada en la carpeta:
+| Documento | Propósito |
+|---|---|
+| [Descripción general](docs/overview.md) | Alcance, objetivos y límites |
+| [Arquitectura](docs/arquitectura.md) | Componentes, flujos y decisiones |
+| [Componentes](docs/componentes.md) | Responsabilidad de cada servicio |
+| [Workflows](docs/workflows.md) | Flujo principal y sincronización |
+| [Base de datos](docs/base-de-datos.md) | Tablas, índices y datos |
+| [Human Handoff](docs/human-handoff.md) | Activación, TTL y recuperación |
+| [Credenciales](docs/credenciales.md) | Variables y secretos requeridos |
+| [Instalación](docs/instalacion.md) | Preparación y puesta en marcha |
+| [Despliegue](docs/despliegue.md) | Topología y procedimiento de release |
+| [Operación](docs/operacion.md) | Tareas de administración |
+| [Pruebas](docs/pruebas.md) | Casos de aceptación |
+| [Seguridad](docs/seguridad.md) | Protección de datos y respuesta a incidentes |
+| [Respaldos](docs/respaldo-restauracion.md) | Backup y recuperación |
+| [Solución de problemas](docs/troubleshooting.md) | Diagnóstico de fallas frecuentes |
+| [Estado del proyecto](docs/estado-proyecto.md) | Madurez, pendientes y riesgos |
+| [Referencias](docs/referencias.md) | Documentación oficial y versiones |
+
+## Estructura del repositorio
 
 ```text
-docs/
+.
+├── docker/       Plantillas de infraestructura y esquema inicial
+├── docs/         Documentación técnica y operativa
+├── images/       Capturas y diagramas
+└── workflows/    Exportaciones de n8n sin credenciales
 ```
 
-Documentos disponibles:
+## Aviso de seguridad
 
-- overview.md
-- arquitectura.md
-- componentes.md
-- workflows.md
-- base-de-datos.md
-- despliegue.md
-- instalacion.md
-- credenciales.md
+Un export anterior del workflow contenía un token de WhatsApp en texto plano. La copia actual fue saneada, pero borrar el secreto del archivo no lo elimina del historial de Git ni lo revoca.
 
-## Archivos de Infraestructura
+Acciones obligatorias:
 
-La carpeta `docker/` contiene ejemplos de configuración para desplegar los principales componentes de la plataforma.
+1. Revocar el token anterior desde Meta.
+2. Generar un token nuevo.
+3. Guardarlo como credencial de n8n o secreto externo.
+4. Revisar el historial antes de publicar el repositorio.
 
-Archivos disponibles:
+Consulta [Seguridad](docs/seguridad.md) para el procedimiento completo.
 
-- docker-compose-postgres-redis.yml.example
-- docker-compose-n8n.yml.example
-- docker-compose-chatwoot.yml.example
-- Caddyfile.example
+## Estado
 
-Estos archivos son plantillas reutilizables y no contienen credenciales reales ni configuraciones sensibles.
-
-## Objetivo
-
-Documentar la arquitectura, instalación, despliegue y funcionamiento de la plataforma para facilitar su mantenimiento, transferencia de conocimiento y futuras implementaciones.
+La documentación y las plantillas son una base reproducible, pero el despliegue debe validarse con las versiones y cuentas reales del entorno. No se incluyen credenciales, datos productivos ni garantías de disponibilidad.

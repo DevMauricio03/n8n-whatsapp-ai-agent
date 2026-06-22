@@ -1,79 +1,91 @@
-# Base de Datos
+# Base de datos
 
-## Descripción General
+PostgreSQL aloja tres bases lógicamente separadas:
 
-La plataforma utiliza PostgreSQL como base de datos principal para el almacenamiento de información estructurada y memoria conversacional.
+| Base | Propósito |
+|---|---|
+| `n8n` | Configuración, credenciales cifradas y ejecuciones |
+| `chatwoot` | Conversaciones, contactos y configuración |
+| `agent` | Datos empresariales y memoria conversacional |
 
-## Responsabilidades
+## Tabla `bd_clientes`
 
-- Almacenamiento de memoria conversacional.
-- Consulta de información de clientes.
-- Consulta de folios.
-- Consulta de estados de pago.
-- Consulta de resultados.
-- Persistencia de información utilizada por el agente de Inteligencia Artificial.
+Se crea mediante [02-agent-schema.sql](../docker/initdb/02-agent-schema.sql).
 
-## Tablas Principales
+| Campo | Tipo | Restricción | Descripción |
+|---|---|---|---|
+| `folio` | `text` | Clave primaria | Identificador del servicio |
+| `razon_social` | `text` | Opcional | Cliente o empresa |
+| `telefono` | `text` | Opcional, indexado | Teléfono asociado |
+| `correo` | `text` | Opcional | Correo registrado |
+| `materia_prima` | `text` | Opcional | Muestra o producto |
+| `estatus_pago` | `text` | Opcional | Estado del pago |
+| `aplica_convenio` | `text` | Opcional | Convenio comercial |
+| `updated_at` | `timestamptz` | Predeterminado `now()` | Última actualización |
 
-### bd_clientes
+Ejemplo ficticio:
 
-Tabla utilizada para almacenar la información consultada por el agente de Inteligencia Artificial.
+```sql
+INSERT INTO bd_clientes (
+  folio, razon_social, telefono, correo, materia_prima,
+  estatus_pago, aplica_convenio
+) VALUES (
+  'DEMO-2026-0001', 'Cliente de prueba', '520000000000',
+  'demo@example.com', 'Muestra de prueba', 'PENDIENTE', 'NO'
+)
+ON CONFLICT (folio) DO UPDATE SET
+  estatus_pago = EXCLUDED.estatus_pago,
+  updated_at = now();
+```
 
-Campos principales:
+## Memoria conversacional
 
-| Campo             | Descripción                                               |
-|-------------------|-----------------------------------------------------------|
-| folio             | Identificador del análisis o servicio.                    |
-| razon_social      | Nombre o razón social del cliente.                        |
-| telefono          | Número telefónico asociado al cliente.                    |
-| correo            | Correo electrónico registrado.                            |
-| materia_prima     | Información relacionada con la muestra o materia prima    |
-|analizada.                                                                     |
-| estatus_pago      | Estado actual del pago asociado al servicio.              |
-| aplica_convenio   | Indicador de aplicación de convenio comercial.            |
+El nodo `Postgres Chat Memory` crea o utiliza una tabla compatible con la versión instalada de n8n. En el workflow revisado la sesión se identifica mediante el teléfono.
 
-### n8n_chat_histories
+Recomendaciones:
 
-Tabla utilizada para almacenar la memoria conversacional del agente.
+- usar un identificador no reutilizable cuando sea posible;
+- definir una política de retención;
+- evitar guardar información innecesaria;
+- comprobar que un agente no pueda consultar conversaciones ajenas;
+- no crear manualmente la tabla sin verificar el esquema esperado por la versión del nodo.
 
-Campos principales:
+## Acceso
 
-| Campo      | Descripción                         |
-|------------|-------------------------------------|
-| id         | Identificador único del registro.   |
-| session_id | Identificador de la conversación.   |
-| message    | Mensaje almacenado en formato JSON. |
+Desde el contenedor:
 
-Esta tabla permite conservar contexto entre mensajes y mantener continuidad durante las conversaciones.
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml \
+  exec postgres sh -lc 'psql -U "$POSTGRES_USER" -d agent'
+```
 
-## Relacion con el Agente de Inteligencia Artificial
+Comprobaciones:
 
-La base de datos PostgreSQL es utilizada por el agente de Inteligencia Artificial mediante herramientas conectadas al workflow de n8n.
+```sql
+\dt
+SELECT count(*) FROM bd_clientes;
+SELECT folio, estatus_pago, updated_at
+FROM bd_clientes
+ORDER BY updated_at DESC
+LIMIT 10;
+```
 
-### Funciones principales
+## Migraciones
 
-- Consulta de información de clientes.
-- Consulta de folios registrados.
-- Consulta de estados de pago.
-- Recuperación de información asociada a servicios.
-- Persistencia de memoria conversacional.
+Los scripts de `docker/initdb/` solo se ejecutan cuando el volumen de PostgreSQL se crea por primera vez. Para entornos existentes:
 
-### Flujo de consulta
+1. crea un respaldo;
+2. aplica el cambio manualmente o mediante una herramienta de migración;
+3. registra la fecha y versión;
+4. prueba lectura y escritura;
+5. conserva un procedimiento de reversión.
 
-1. El cliente envía un mensaje mediante WhatsApp.
-2. El mensaje es procesado por el agente.
-3. El agente determina si requiere información almacenada.
-4. Se ejecuta una consulta sobre PostgreSQL.
-5. La información obtenida es utilizada para construir la respuesta.
-6. La respuesta es enviada nuevamente al cliente.
+## Retención sugerida
 
-### Memoria Conversacional
+La organización debe definirla según su base legal. Como punto de partida:
 
-La tabla `n8n_chat_histories` permite conservar el contexto de conversaciones previas.
-
-Esto permite:
-
-- Mantener continuidad entre mensajes.
-- Recordar información previamente proporcionada por el cliente.
-- Reducir solicitudes repetidas de información.
-- Generar respuestas más coherentes y contextualizadas.
+- ejecuciones exitosas de n8n: retención corta;
+- ejecuciones con error: suficiente para diagnóstico;
+- memoria conversacional: solo el periodo necesario para atención;
+- respaldos: cifrados y con caducidad;
+- datos de clientes: según contrato y regulación aplicable.

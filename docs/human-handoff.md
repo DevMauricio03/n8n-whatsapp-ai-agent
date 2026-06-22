@@ -1,50 +1,76 @@
 # Human Handoff
 
-## Descripción General
+Human Handoff evita que la IA responda mientras un agente humano atiende la conversación desde Chatwoot.
 
-El sistema incorpora un mecanismo de Human Handoff que permite suspender temporalmente la atención automatizada cuando una conversación requiere intervención humana.
+## Estado
 
-Cuando un agente humano toma control de una conversación, el sistema evita que los mensajes sean procesados por el agente de Inteligencia Artificial.
+El workflow actual usa una clave Redis similar a:
 
-Esta funcionalidad permite combinar atención automatizada y atención humana dentro del mismo canal de comunicación.
+```text
+human_mode:human_mode:<telefono>
+```
 
-## Objetivos
+Valor:
 
-- Evitar respuestas automáticas durante la atención humana.
-- Permitir la intervención de personal de soporte.
-- Mantener continuidad en la conversación.
-- Mejorar la experiencia del cliente.
+```text
+true
+```
 
-## Funcionamiento
+TTL actual:
 
-El mecanismo de Human Handoff utiliza Redis para almacenar un indicador temporal asociado a una conversación.
+```text
+1800 segundos (30 minutos)
+```
 
-Cuando una conversación es transferida a un agente humano, se registra un estado temporal que bloquea el procesamiento automático de mensajes.
+Para una implementación nueva se recomienda:
 
-Cada nuevo mensaje recibido verifica primero si existe un estado activo de atención humana.
+```text
+human_mode:<account_id>:<conversation_id>
+```
 
-Si el estado existe:
+Esto evita colisiones si un teléfono aparece en más de una bandeja o cuenta.
 
-- El mensaje no es enviado al agente de Inteligencia Artificial.
-- El flujo automatizado se detiene.
-- La conversación permanece bajo control humano.
+## Activación
 
-Si el estado no existe:
+1. Un agente envía un mensaje desde Chatwoot.
+2. Chatwoot emite un evento saliente.
+3. n8n identifica que no es un mensaje `incoming`.
+4. n8n establece la clave con TTL.
+5. Los mensajes siguientes del cliente no pasan al agente de IA.
 
-- El mensaje continúa normalmente hacia el flujo automatizado.
-- El agente de Inteligencia Artificial puede procesar la conversación.
+## Desactivación
 
-Este mecanismo permite evitar conflictos entre respuestas automáticas y respuestas generadas por agentes humanos.
+En la implementación actual el estado expira automáticamente. La operación recomendada añade una acción explícita al cerrar o resolver la conversación:
 
-## Persistencia del Estado
+```redis
+DEL human_mode:<account_id>:<conversation_id>
+```
 
-El estado de atención humana se almacena temporalmente en Redis utilizando una clave asociada al identificador de la conversación.
+No debe eliminarse el bloqueo mientras un agente siga escribiendo.
 
-Este estado posee un tiempo de expiración configurable (TTL), permitiendo que el sistema regrese automáticamente al modo de atención automatizada una vez finalizado el periodo definido.
+## Renovación
 
-Beneficios:
-$
-- No requiere intervención manual para restaurar el modo automático.
-- Reduce el riesgo de conversaciones bloqueadas permanentemente.
-- Permite una administración eficiente de recursos.
-- Facilita la coexistencia entre automatización y atención humana.
+Cada nueva respuesta humana debe renovar el TTL. Si la atención suele durar más de 30 minutos, ajusta el valor según métricas reales, no de forma arbitraria.
+
+## Verificación
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml \
+  exec redis sh -lc 'redis-cli -a "$REDIS_PASSWORD" GET "human_mode:human_mode:<telefono>"'
+```
+
+Consultar TTL:
+
+```bash
+docker compose --env-file .env -f docker/docker-compose.yml \
+  exec redis sh -lc 'redis-cli -a "$REDIS_PASSWORD" TTL "human_mode:human_mode:<telefono>"'
+```
+
+## Casos límite
+
+- Si Redis no está disponible, la opción segura es no responder automáticamente.
+- Si el agente humano contesta cerca de la expiración, el TTL debe renovarse.
+- Si un evento saliente automático se confunde con uno humano, puede bloquear la conversación sin necesidad.
+- Si el teléfono cambia de formato, la clave puede dejar de coincidir.
+
+Consulta los escenarios HH-01 a HH-04 en [Pruebas](pruebas.md).

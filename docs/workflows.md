@@ -1,151 +1,112 @@
-# Workflows
+# Workflows de n8n
 
-## Workflow Principal de Atención Automatizada
+El repositorio incluye [un workflow de ejemplo saneado](../workflows/atencion-whatsapp-principal.example.json). Se entrega desactivado y sin credenciales asignadas.
 
-El workflow principal es responsable de recibir mensajes desde WhatsApp, procesarlos mediante n8n y generar respuestas automáticas utilizando Inteligencia Artificial.
+## Dependencias
 
-Este workflow integra mecanismos de control conversacional, procesamiento de audio, memoria conversacional, consultas de información y atención automatizada para clientes de Extracta.
+Antes de importarlo deben existir credenciales de:
 
-### 1. Recepción del Mensaje
+- OpenAI;
+- PostgreSQL, apuntando a la base `agent`;
+- Redis;
+- WhatsApp Business Cloud;
+- HTTP Header Auth para descargar medios de WhatsApp;
+- Google Drive OAuth2.
 
-El workflow inicia mediante un Webhook conectado a Chatwoot.
+El archivo también usa variables de entorno definidas en [.env.example](../.env.example).
 
-Cada mensaje recibido contiene información relacionada con:
+## Flujo principal
 
-- Conversación.
-- Cliente.
-- Contenido del mensaje.
-- Archivos adjuntos.
-- Tipo de mensaje.
+```mermaid
+flowchart TD
+    A[Webhook de Chatwoot] --> B{¿Mensaje entrante?}
+    B -->|No| C[Activar Human Handoff]
+    B -->|Sí| D[Consultar bloqueo en Redis]
+    D --> E{¿Modo humano activo?}
+    E -->|Sí| F[Finalizar]
+    E -->|No| G[Extraer datos]
+    G --> H{Texto o audio}
+    H -->|Audio| I[Descargar y transcribir]
+    H -->|Texto| J[Normalizar texto]
+    I --> K[Buffer Redis]
+    J --> K
+    K --> L[Agrupar mensajes]
+    L --> M{Horario de atención}
+    M -->|Fuera| N[Mensaje informativo]
+    M -->|Dentro| O[Agente de IA]
+    O --> P{Tipo de respuesta}
+    P -->|Texto| Q[Enviar mensaje]
+    P -->|Precio| R[Enviar imagen]
+```
 
-### 2. Validación de Human Handoff
+## Reglas importantes
 
-Antes de iniciar cualquier procesamiento, el sistema consulta Redis para verificar si la conversación se encuentra bajo atención humana.
+### Evitar bucles
 
-Si existe un estado activo de Human Handoff:
+El nodo `msg_from_client` solo deja pasar mensajes `incoming`. Los mensajes salientes activan el estado humano porque representan intervención desde Chatwoot.
 
-- El workflow se detiene.
-- No se ejecuta el agente de Inteligencia Artificial.
-- La conversación permanece bajo control humano.
+### Audio
 
-Si no existe un estado activo:
+La descarga de medios usa Graph API y una credencial `HTTP Header Auth` de n8n. El token no debe escribirse directamente en el nodo ni en el JSON exportado.
 
-- El mensaje continúa hacia el procesamiento automatizado.
+### Buffer
 
-### 3. Clasificación del Mensaje
+La lista se identifica actualmente con el teléfono del remitente. Para evitar colisiones se recomienda el formato:
 
-El sistema identifica automáticamente el tipo de mensaje recibido.
+```text
+buffer:<account_id>:<conversation_id>
+```
 
-Tipos soportados:
+El workflow actual debe probarse con mensajes simultáneos antes de aumentar tráfico.
 
-- Texto.
-- Audio.
+### Horario
 
-### 4. Procesamiento de Audio
+La regla usa `America/Mexico_City`, de lunes a viernes, de 08:00 a 16:59. Los días festivos no están modelados.
 
-Cuando el mensaje recibido corresponde a una nota de voz:
+### Agente
 
-1. Se obtiene el archivo desde WhatsApp Cloud API.
-2. Se descarga el contenido multimedia.
-3. El audio es enviado al servicio de transcripción.
-4. La transcripción obtenida se convierte en texto para continuar el flujo.
+El agente:
 
-Una vez transcrito, el mensaje sigue exactamente el mismo proceso que un mensaje de texto convencional.
+- mantiene una ventana de contexto de 10 mensajes;
+- consulta `bd_clientes` cuando recibe un folio;
+- devuelve claves especiales para seleccionar imágenes;
+- no debe inventar precios, resultados ni estados.
 
-### 5. Buffer Conversacional
+## Sincronización de datos
 
-Antes de enviar información al agente de Inteligencia Artificial, los mensajes son almacenados temporalmente en Redis.
+El mismo archivo contiene una rama que observa un XLSX de Google Drive:
 
-El objetivo es evitar que múltiples mensajes consecutivos generen respuestas independientes.
+1. detecta cambios;
+2. descarga el archivo;
+3. extrae las filas;
+4. ejecuta un `upsert` por `folio` en `bd_clientes`.
 
-El sistema:
+El encabezado esperado del archivo es:
 
-1. Almacena temporalmente cada mensaje recibido.
-2. Espera un periodo de tiempo configurable.
-3. Verifica si llegaron mensajes adicionales.
-4. Agrupa todos los mensajes pendientes.
-5. Genera una única consulta para el agente.
+| Columna XLSX | Campo PostgreSQL |
+|---|---|
+| `Folio` | `folio` |
+| `Razon_Social` | `razon_social` |
+| `Telefono` | `telefono` |
+| `Correo` | `correo` |
+| `Materia_Prima` | `materia_prima` |
+| `Estatus_Pago` | `estatus_pago` |
+| `Aplica_Convenio` | `aplica_convenio` |
 
-Beneficios:
+## Importación segura
 
-- Reduce respuestas fragmentadas.
-- Mejora la comprensión del contexto.
-- Disminuye el consumo de recursos.
-- Genera conversaciones más naturales.
+1. Importa el JSON.
+2. Confirma que aparece desactivado.
+3. Asigna cada credencial manualmente.
+4. Revisa variables y URLs.
+5. Sustituye precios y mensajes por datos aprobados.
+6. Ejecuta cada rama con datos ficticios.
+7. Actívalo solo después de completar [Pruebas](pruebas.md).
 
-### 6. Validación de Horario de Atención
+## Riesgos conocidos
 
-Antes de procesar una consulta mediante Inteligencia Artificial, el sistema verifica si la solicitud fue recibida dentro del horario de atención establecido.
-
-Si la consulta se recibe fuera del horario laboral:
-
-- Se envía un mensaje informativo al cliente.
-- No se ejecuta el agente de Inteligencia Artificial.
-- La conversación queda registrada para atención posterior.
-
-Si la consulta se recibe dentro del horario laboral:
-
-- El flujo continúa normalmente.
-- La solicitud es enviada al agente de Inteligencia Artificial.
-
-### 7. Procesamiento mediante Inteligencia Artificial
-
-Una vez validado el horario de atención, la consulta es enviada al agente de Inteligencia Artificial.
-
-El agente utiliza:
-
-- Instrucciones de comportamiento.
-- Contexto conversacional.
-- Memoria histórica de la conversación.
-- Herramientas de consulta de información.
-
-Entre sus funciones principales se encuentran:
-
-- Responder preguntas sobre servicios.
-- Orientar a los clientes sobre análisis disponibles.
-- Solicitar información necesaria para consultas.
-- Consultar información asociada a folios.
-- Generar respuestas contextuales basadas en conversaciones previas.
-
-### 8. Memoria Conversacional y Consulta de Información
-
-El agente utiliza memoria conversacional almacenada en PostgreSQL para mantener contexto entre mensajes de una misma conversación.
-
-Esto permite:
-
-- Recordar información previamente proporcionada por el cliente.
-- Mantener continuidad en conversaciones largas.
-- Comprender referencias a mensajes anteriores.
-- Reducir solicitudes repetidas de información.
-
-Adicionalmente, el agente puede utilizar herramientas de consulta para obtener información almacenada en la base de datos cuando el cliente proporciona datos válidos para realizar búsquedas.
-
-### 9. Generación y Envío de Respuestas
-
-Después de procesar la solicitud, el sistema clasifica la respuesta generada.
-
-Dependiendo del tipo de información solicitada, el workflow puede:
-
-- Enviar una respuesta de texto.
-- Enviar información complementaria mediante imágenes.
-- Enviar información relacionada con paquetes o análisis específicos.
-
-Todas las respuestas son enviadas mediante WhatsApp Cloud API hacia el cliente.
-
-El objetivo es proporcionar información clara, consistente y fácil de consultar desde dispositivos móviles.
-
-## Workflow de Sincronización de Datos
-
-Además del workflow principal de atención automatizada, el sistema cuenta con un workflow dedicado a la actualización de información utilizada por el agente.
-
-### Flujo General
-
-1. Se detectan cambios en una fuente de datos.
-2. Se obtiene el archivo actualizado.
-3. Se extrae la información necesaria.
-4. Los registros son insertados o actualizados en PostgreSQL.
-5. La información queda disponible para futuras consultas realizadas por el agente.
-
-### Objetivo
-
-Mantener actualizada la información utilizada por el sistema sin necesidad de modificaciones manuales en la base de datos.
+- El export conserva lógica y textos de negocio; deben revisarse antes de reutilizarse.
+- El webhook depende del payload de Chatwoot.
+- La versión de Graph API debe actualizarse de forma planificada.
+- Las variables `$env` pueden estar restringidas según la configuración o versión de n8n; si ocurre, usa credenciales o variables administradas desde n8n.
+- No existe todavía un workflow separado de manejo global de errores.

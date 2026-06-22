@@ -1,7 +1,13 @@
-<N8N_DOMAIN> {
+{
+    email {$LETSENCRYPT_EMAIL}
+}
+
+{$N8N_DOMAIN} {
+    encode zstd gzip
     reverse_proxy n8n:5678
 }
 
-<CHATWOOT_DOMAIN> {
+{$CHATWOOT_DOMAIN} {
+    encode zstd gzip
     reverse_proxy chatwoot-rails:3000
 }

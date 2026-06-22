@@ -1,5 +1,5 @@
 {
-  "name": "My workflow 2",
+  "name": "Atención WhatsApp - Principal (ejemplo)",
   "nodes": [
     {
       "parameters": {
@@ -57,13 +57,7 @@
         -48
       ],
       "id": "51d38e27-bae0-4ea8-a16e-595f7110154a",
-      "name": "Transcribe a recording",
-      "credentials": {
-        "openAiApi": {
-          "id": "qPMtAeHWaAkSpZgX",
-          "name": "OpenAI account"
-        }
-      }
+      "name": "Transcribe a recording"
     },
     {
       "parameters": {
@@ -158,13 +152,7 @@
         80
       ],
       "id": "19f13c68-6eb7-459d-85f6-c2becc2c960d",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "qPMtAeHWaAkSpZgX",
-          "name": "OpenAI account"
-        }
-      }
+      "name": "OpenAI Chat Model"
     },
     {
       "parameters": {
@@ -179,13 +167,7 @@
         80
       ],
       "id": "6ece114c-8665-4148-83a9-cc51ce4aec95",
-      "name": "Postgres Chat Memory",
-      "credentials": {
-        "postgres": {
-          "id": "Ce01AsYVQqWsHhSa",
-          "name": "Postgres account"
-        }
-      }
+      "name": "Postgres Chat Memory"
     },
     {
       "parameters": {
@@ -307,23 +289,15 @@
         1072
       ],
       "id": "1997d358-27b9-4757-81a6-3aad55133a70",
-      "name": "Insert or update rows in a table",
-      "credentials": {
-        "postgres": {
-          "id": "Ce01AsYVQqWsHhSa",
-          "name": "Postgres account"
-        }
-      }
+      "name": "Insert or update rows in a table"
     },
     {
       "parameters": {
         "operation": "download",
         "fileId": {
           "__rl": true,
-          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
-          "mode": "list",
-          "cachedResultName": "base_madre_pruebas.xlsx",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+          "value": "={{$env.GOOGLE_DRIVE_SOURCE_FILE_ID}}",
+          "mode": "id"
         },
         "options": {}
       },
@@ -334,13 +308,7 @@
         1104
       ],
       "id": "787e3798-0c76-4daf-afe5-8a8ff10f62d3",
-      "name": "Download file",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "cDapNszbC7uduj2R",
-          "name": "Google Drive account"
-        }
-      }
+      "name": "Download file"
     },
     {
       "parameters": {
@@ -354,10 +322,8 @@
         "triggerOn": "specificFile",
         "fileToWatch": {
           "__rl": true,
-          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
-          "mode": "list",
-          "cachedResultName": "base_madre_pruebas.xlsx",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+          "value": "={{$env.GOOGLE_DRIVE_SOURCE_FILE_ID}}",
+          "mode": "id"
         }
       },
       "type": "n8n-nodes-base.googleDriveTrigger",
@@ -367,13 +333,7 @@
         1264
       ],
       "id": "3b6a61bb-29e3-4a82-b985-916d4cafbe96",
-      "name": "Google Drive Trigger",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "cDapNszbC7uduj2R",
-          "name": "Google Drive account"
-        }
-      }
+      "name": "Google Drive Trigger"
     },
     {
       "parameters": {
@@ -408,30 +368,17 @@
         48
       ],
       "id": "65ef4ace-8c76-45cb-aba3-0b3a0589d5f1",
-      "name": "Select rows from a table in Postgres",
-      "credentials": {
-        "postgres": {
-          "id": "Ce01AsYVQqWsHhSa",
-          "name": "Postgres account"
-        }
-      }
+      "name": "Select rows from a table in Postgres"
     },
     {
       "parameters": {
-        "url": "=https://graph.facebook.com/v22.0/{{ $json.voice_message }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAAfy1IbkWtwBRRAq7QvkUwZCJtxArhZBETqCvTRSH3yZCdnvwWcPd4MUDOusrH9DwfRkeEfocZBRyXduUKP3oJH7DmiitZCCoAEkFZAeLlrNqBwBB8mbG9SP3qvyBObdAxT3iFG8rP7PymDEKdmspk9ZCjYJnqpAK4hAZBpp1lYv5R3N9KCIDR2yu8eUmdfqvgZDZD"
-            }
-          ]
-        },
+        "url": "=https://graph.facebook.com/{{$env.WHATSAPP_GRAPH_API_VERSION}}/{{$json.voice_message}}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"message\": {\n    \"key\": {\n      \"id\": \"{{ $json.voice_message }}\"\n    }\n  },\n  \"convertToMp4\": false\n}",
-        "options": {}
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
@@ -455,13 +402,7 @@
         -160
       ],
       "id": "1e3c31cf-f944-4d7e-b323-7ed5ddd8b94d",
-      "name": "buffer",
-      "credentials": {
-        "redis": {
-          "id": "JfOdf7Eu03ZkAwGh",
-          "name": "Redis account"
-        }
-      }
+      "name": "buffer"
     },
     {
       "parameters": {
@@ -477,13 +418,7 @@
         -160
       ],
       "id": "3533b82c-547d-472c-a8ef-400e38e2ade9",
-      "name": "get_buffer_data ",
-      "credentials": {
-        "redis": {
-          "id": "JfOdf7Eu03ZkAwGh",
-          "name": "Redis account"
-        }
-      }
+      "name": "get_buffer_data "
     },
     {
       "parameters": {
@@ -590,13 +525,7 @@
         -192
       ],
       "id": "e45f6e9a-5867-4d46-aa3b-1deb043db0d8",
-      "name": "delete_buffer",
-      "credentials": {
-        "redis": {
-          "id": "JfOdf7Eu03ZkAwGh",
-          "name": "Redis account"
-        }
-      }
+      "name": "delete_buffer"
     },
     {
       "parameters": {
@@ -630,15 +559,6 @@
     {
       "parameters": {
         "url": "={{ $json.id }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Bearer EAAfy1IbkWtwBRRAq7QvkUwZCJtxArhZBETqCvTRSH3yZCdnvwWcPd4MUDOusrH9DwfRkeEfocZBRyXduUKP3oJH7DmiitZCCoAEkFZAeLlrNqBwBB8mbG9SP3qvyBObdAxT3iFG8rP7PymDEKdmspk9ZCjYJnqpAK4hAZBpp1lYv5R3N9KCIDR2yu8eUmdfqvgZDZD"
-            }
-          ]
-        },
         "options": {
           "response": {
             "response": {
@@ -646,7 +566,9 @@
               "outputPropertyName": "=file"
             }
           }
-        }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
@@ -775,10 +697,10 @@
     {
       "parameters": {
         "operation": "send",
-        "phoneNumberId": "1120986437770389",
+        "phoneNumberId": "={{$env.WHATSAPP_PHONE_NUMBER_ID}}",
         "recipientPhoneNumber": "={{ $('Webhook').item.json.body.conversation.contact_inbox.source_id }}",
         "messageType": "image",
-        "mediaLink": "https://drive.google.com/uc?export=view&id=1YJcWCQgA_Weq4BliETJfs8R73E5hFFZQ",
+        "mediaLink": "={{$env.PRICE_IMAGE_PACKAGE_1_URL}}",
         "additionalFields": {
           "mediaCaption": "={{`🥇 *PAQUETE 1*\n\n💰 *$1,895 MXN* (IVA incluido)\n\n📋 Análisis de mezcal con fines de certificación.\n\n✅ Incluye:\n• % Alc. Vol.\n• Extracto seco\n• Alcoholes superiores\n• Metanol\n• Furfural\n• Aldehídos\n• Plomo\n• Arsénico\n\n📦 Muestra requerida:\nBotella de 1 L sellada por la Unidad de Inspección.`}}"
         }
@@ -791,21 +713,15 @@
       ],
       "id": "a5add532-6d46-4095-9104-a9edfe0da16d",
       "name": "Send image - Paquete 1",
-      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
-      "credentials": {
-        "whatsAppApi": {
-          "id": "K9lyNrB11N8Ly5Pa",
-          "name": "WhatsApp account"
-        }
-      }
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989"
     },
     {
       "parameters": {
         "operation": "send",
-        "phoneNumberId": "1120986437770389",
+        "phoneNumberId": "={{$env.WHATSAPP_PHONE_NUMBER_ID}}",
         "recipientPhoneNumber": "={{ $('Webhook').item.json.body.conversation.contact_inbox.source_id }}",
         "messageType": "image",
-        "mediaLink": "https://drive.google.com/uc?export=view&id=1RLwpnPEY_2BYv2qrUH12IHJmTQpXRnDo",
+        "mediaLink": "={{$env.PRICE_IMAGE_PACKAGE_2_URL}}",
         "additionalFields": {
           "mediaCaption": "={{`🥈 *PAQUETE 2*\n\n💰 *$1,100 MXN* (IVA incluido)\n\n📋 Análisis preliminar de bebidas alcohólicas.\n\n✅ Incluye los mismos 8 ensayos del Paquete 1.\n\n📦 Muestra requerida:\nBotella de 1 L identificada y sin derrames.`}}"
         }
@@ -818,21 +734,15 @@
       ],
       "id": "ccd4e84b-327f-48c0-bd0a-9d4475f97b7a",
       "name": "Send image - Paquete 2",
-      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
-      "credentials": {
-        "whatsAppApi": {
-          "id": "K9lyNrB11N8Ly5Pa",
-          "name": "WhatsApp account"
-        }
-      }
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989"
     },
     {
       "parameters": {
         "operation": "send",
-        "phoneNumberId": "1120986437770389",
+        "phoneNumberId": "={{$env.WHATSAPP_PHONE_NUMBER_ID}}",
         "recipientPhoneNumber": "={{ $('Webhook').item.json.body.conversation.contact_inbox.source_id }}",
         "messageType": "image",
-        "mediaLink": "https://drive.google.com/uc?export=view&id=1A2m_QKxXcmnkov2I_xW7ZCgmr6BhX0Y-",
+        "mediaLink": "={{$env.PRICE_IMAGE_ANALYSIS_URL}}",
         "additionalFields": {
           "mediaCaption": "={{`\n━━━━━━━━━━━━━━\n🧪 *ANÁLISIS INDIVIDUALES*\n━━━━━━━━━━━━━━\n\n• % Alc. Vol. 20°C — *$274 MXN*\n• Extracto seco — *$142 MXN*\n• Furfural — *$319 MXN*\n• Metanol — *$319 MXN*\n• Alcoholes superiores — *$319 MXN*\n• Aldehídos — *$319 MXN*\n• Ésteres — *$319 MXN*\n• Densidad — *$319 MXN*\n• Plomo — *$390 MXN*\n• Arsénico — *$390 MXN*\n• Cobre — *$390 MXN*\n• ART — *$174 MXN*\n• ARD — *$174 MXN*`}}"
         }
@@ -845,18 +755,12 @@
       ],
       "id": "c5ba1d0c-7cb2-46e1-93d4-7af0502da32e",
       "name": "Send image - Analisis",
-      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
-      "credentials": {
-        "whatsAppApi": {
-          "id": "K9lyNrB11N8Ly5Pa",
-          "name": "WhatsApp account"
-        }
-      }
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989"
     },
     {
       "parameters": {
         "operation": "send",
-        "phoneNumberId": "1120986437770389",
+        "phoneNumberId": "={{$env.WHATSAPP_PHONE_NUMBER_ID}}",
         "recipientPhoneNumber": "={{ $('Webhook').item.json.body.conversation.messages[0].sender.phone_number }}",
         "textBody": "={{$json.output}}",
         "additionalFields": {}
@@ -869,13 +773,7 @@
       ],
       "id": "280de0c6-f85d-4122-ae3b-35489d9f6781",
       "name": "Send message",
-      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
-      "credentials": {
-        "whatsAppApi": {
-          "id": "K9lyNrB11N8Ly5Pa",
-          "name": "WhatsApp account"
-        }
-      }
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989"
     },
     {
       "parameters": {
@@ -950,8 +848,8 @@
     {
       "parameters": {
         "operation": "send",
-        "phoneNumberId": "1120986437770389",
-        "recipientPhoneNumber": "529518826439",
+        "phoneNumberId": "={{$env.WHATSAPP_PHONE_NUMBER_ID}}",
+        "recipientPhoneNumber": "={{$(\"Webhook\").item.json.body.conversation.contact_inbox.source_id}}",
         "textBody": "={{ $json.HorarioAtencion }}",
         "additionalFields": {}
       },
@@ -963,18 +861,12 @@
       ],
       "id": "256484a0-40f9-4d22-a5f0-b1951a0a5fba",
       "name": "Send message2",
-      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
-      "credentials": {
-        "whatsAppApi": {
-          "id": "K9lyNrB11N8Ly5Pa",
-          "name": "WhatsApp account"
-        }
-      }
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989"
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "bc80c3e2-f9ea-432b-8518-249f2810e415",
+        "path": "whatsapp-chatwoot",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -1070,13 +962,7 @@
         592
       ],
       "id": "aa6d3347-33cc-4de6-a7a7-cb691c47e675",
-      "name": "set_human_mode",
-      "credentials": {
-        "redis": {
-          "id": "JfOdf7Eu03ZkAwGh",
-          "name": "Redis account"
-        }
-      }
+      "name": "set_human_mode"
     },
     {
       "parameters": {
@@ -1184,13 +1070,7 @@
         -144
       ],
       "id": "d6f180ba-f2ea-4d04-9f30-0a99844b16c2",
-      "name": "get",
-      "credentials": {
-        "redis": {
-          "id": "JfOdf7Eu03ZkAwGh",
-          "name": "Redis account"
-        }
-      }
+      "name": "get"
     },
     {
       "parameters": {
@@ -1642,15 +1522,10 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
-  },
-  "versionId": "b37ad409-a624-43f4-b88c-87187d7792a6",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "162d13affcb6993a63be37efb1b3308446c484df77b4374ab2424b91b90a9f5b"
   },
   "id": "StEoh38GmLfROHoU",
   "tags": []
