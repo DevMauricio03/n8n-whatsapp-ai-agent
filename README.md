@@ -91,20 +91,3 @@ La guía detallada está en [Instalación](docs/instalacion.md).
 ├── images/       Capturas y diagramas
 └── workflows/    Exportaciones de n8n sin credenciales
 ```
-
-## Aviso de seguridad
-
-Un export anterior del workflow contenía un token de WhatsApp en texto plano. La copia actual fue saneada, pero borrar el secreto del archivo no lo elimina del historial de Git ni lo revoca.
-
-Acciones obligatorias:
-
-1. Revocar el token anterior desde Meta.
-2. Generar un token nuevo.
-3. Guardarlo como credencial de n8n o secreto externo.
-4. Revisar el historial antes de publicar el repositorio.
-
-Consulta [Seguridad](docs/seguridad.md) para el procedimiento completo.
-
-## Estado
-
-La documentación y las plantillas son una base reproducible, pero el despliegue debe validarse con las versiones y cuentas reales del entorno. No se incluyen credenciales, datos productivos ni garantías de disponibilidad.
