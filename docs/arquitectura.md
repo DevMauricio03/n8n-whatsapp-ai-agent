@@ -30,35 +30,77 @@ flowchart TB
 ## Flujo de un mensaje
 
 ```mermaid
-sequenceDiagram
-    participant C as Cliente
-    participant W as WhatsApp
-    participant CW as Chatwoot
-    participant N as n8n
-    participant R as Redis
-    participant P as PostgreSQL
-    participant AI as OpenAI
+%%{init: { "flowchart": { "defaultRenderer": "elk", "curve": "basis" }, "themeVariables": { "fontSize": "13px" }}}%%
+flowchart LR
 
-    C->>W: Envía texto o audio
-    W->>CW: Entrega el mensaje
-    CW->>N: Webhook
-    N->>R: Consulta Human Handoff
-    alt Atención humana activa
-        N-->>N: Detiene automatización
-    else Automatización disponible
-        N->>R: Agrega mensaje al buffer
-        N->>N: Agrupa y valida horario
-        opt Mensaje de audio
-            N->>AI: Solicita transcripción
-            AI-->>N: Texto transcrito
-        end
-        N->>AI: Envía mensaje y contexto
-        AI->>P: Consulta por herramienta si necesita datos
-        P-->>AI: Devuelve registros
-        AI-->>N: Respuesta o clave de contenido
-        N->>W: Envía texto o imagen
-        W-->>C: Entrega la respuesta
-    end
+%% SECCIONES HORIZONTALES
+subgraph Cliente["Cliente"]
+    A1["fa:fa-whatsapp Cliente WhatsApp"]:::green
+end
+
+subgraph Entrada["Entrada y Mensajería"]
+    A2["fa:fa-cloud WhatsApp Cloud API"]:::blue
+    A3["fa:fa-comments Chatwoot recibe mensaje"]:::blue
+    A4["fa:fa-link Webhook a n8n"]:::blue
+end
+
+subgraph Lógica["Lógica y Decisión"]
+    B1["fa:fa-database Consulta Redis (estado atención)"]:::gray
+    B2{"¿Atención humana activa?"}:::gray
+    B3["fa:fa-user Espera atención humana (mensajes en pausa)\nTTL 30 min o desactivación manual"]:::gray
+    B4["fa:fa-robot Continuar automatización"]:::gray
+end
+
+%% RAMA PARA TEXTO (SUPERIOR)
+subgraph Texto["Canal Texto"]
+    T1["fa:fa-database Buffer Redis"]:::blue
+    T2["fa:fa-clock Validar horario y agrupar mensajes"]:::blue
+    T3["fa:fa-brain OpenAI procesa texto"]:::orange
+    T4["fa:fa-database Consultar PostgreSQL (contexto)"]:::blue
+    T5["fa:fa-comments Generar respuesta (texto o imagen)"]:::orange
+end
+
+%% RAMA PARA AUDIO (INFERIOR)
+subgraph Audio["Canal Audio"]
+    A5["fa:fa-microphone Transcribir con OpenAI Whisper"]:::orange
+    A6["fa:fa-database Guarda transcripción Redis"]:::blue
+    A7["fa:fa-clock Validar horario y agrupar mensajes"]:::blue
+    A8["fa:fa-brain OpenAI procesa texto derivado de audio"]:::orange
+    A9["fa:fa-database Consultar PostgreSQL (contexto)"]:::blue
+    A10["fa:fa-comments Generar respuesta (texto o imagen)"]:::orange
+end
+
+subgraph Salida["Entrega de Respuesta"]
+    E1["fa:fa-paper-plane n8n → WhatsApp API"]:::blue
+    E2["fa:fa-message Chatwoot → Cliente"]:::blue
+    E3["fa:fa-whatsapp Cliente recibe respuesta"]:::green
+end
+
+%% FLUJO PRINCIPAL HORIZONTAL
+A1 --> A2 --> A3 --> A4 --> B1 --> B2
+B2 -->|Sí| B3
+B2 -->|No| B4
+
+%% BIFURCACIÓN A CANALES PARALELOS
+B4 -->|Texto| T1
+B4 -->|Audio| A5
+
+%% CANAL TEXTO
+T1 --> T2 --> T3 --> T4 --> T5 --> E1
+
+%% CANAL AUDIO
+A5 --> A6 --> A7 --> A8 --> A9 --> A10 --> E1
+
+E1 --> E2 --> E3
+
+%% VUELTA DESDE HUMAN MODE
+B3 -. "Expira TTL (30 min)\n o se desactiva manualmente" .-> B4
+
+%% ESTILOS
+classDef green stroke:#4ade80,fill:#f0fdf4;
+classDef blue stroke:#38bdf8,fill:#f0f9ff;
+classDef orange stroke:#fb923c,fill:#fff7ed;
+classDef gray stroke:#6b7280,fill:#f9fafb;
 ```
 
 ## Capas
