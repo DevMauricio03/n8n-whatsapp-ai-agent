@@ -1,17 +1,6 @@
 # Arquitectura general
 
-```mermaid
-flowchart LR
-    Client[Cliente] <--> Meta[WhatsApp Cloud API]
-    Meta <--> Chatwoot[Chatwoot]
-    Human[Agente humano] <--> Chatwoot
-    Chatwoot -->|Webhook| N8N[n8n]
-    N8N <--> OpenAI[OpenAI]
-    N8N <--> Postgres[(PostgreSQL)]
-    N8N <--> Redis[(Redis)]
-    Drive[Google Drive] --> N8N
-    N8N --> Meta
-```
+![Arquitectura General](./arquitectura-general.png)
 
 ## Lectura
 

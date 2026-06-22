@@ -1,5 +1,9 @@
 # Base de datos
 
+![Arquitectura de Base de Datos](./diagramas/base-datos.png)
+
+## Estructura
+
 PostgreSQL aloja tres bases lógicamente separadas:
 
 | Base | Propósito |

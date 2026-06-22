@@ -2,26 +2,7 @@
 
 ## Topología
 
-```mermaid
-flowchart TB
-    Internet[Internet] --> Caddy[Caddy :80/:443]
-    Caddy --> N8N[n8n :5678]
-    Caddy --> CW[Chatwoot Rails :3000]
-    CW --> Sidekiq[Chatwoot Sidekiq]
-    N8N --> PG[(PostgreSQL)]
-    CW --> PG
-    N8N --> RD[(Redis)]
-    CW --> RD
-
-    subgraph Docker[Red Docker platform_net]
-      Caddy
-      N8N
-      CW
-      Sidekiq
-      PG
-      RD
-    end
-```
+![Diagrama de Despliegue](./diagramas/despliegue.png)
 
 ## Archivos
 
