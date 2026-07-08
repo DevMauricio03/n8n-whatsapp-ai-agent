@@ -143,7 +143,7 @@ Abre `https://N8N_DOMAIN`, crea el propietario inicial y configura:
 Importa:
 
 ```text
-workflows/atencion-whatsapp-principal.example.json
+workflows/My workflow 2.json
 ```
 
 Después:

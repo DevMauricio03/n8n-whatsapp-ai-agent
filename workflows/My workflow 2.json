@@ -1,0 +1,2710 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a7e0933b-f7ee-456d-b142-29e23b7412fc",
+              "leftValue": "={{ $json.messageType }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "d5389881-c266-4d98-8258-5f1afc5e491a",
+              "leftValue": "=const data = $input.first().json;\n\nreturn {\n  json: {\n    messageType: data.voice_message ? 'audio' : 'text',\n    text_message: data.text_message,\n    voice_message: data.voice_message,\n    conversation: data.text_message,\n    sender: data.sender,\n    sessionId: data.sessionId,\n    data_time: data.data_time\n  }\n};",
+              "rightValue": "stickerMessage",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1888,
+        -112
+      ],
+      "id": "d5e00780-7b16-4a04-8dda-6fa253413634",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "file",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -976,
+        -48
+      ],
+      "id": "51d38e27-bae0-4ea8-a16e-595f7110154a",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "qPMtAeHWaAkSpZgX",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f7c3d75-7e5a-451d-b284-773532b7712c",
+              "name": "final_message",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "b07f6b18-0f0b-49fb-b9ea-21e87afb66bf",
+              "name": "sessionId",
+              "value": "={{ $('If').first().json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        -48
+      ],
+      "id": "8a589956-be6e-4a72-8d4d-4ff07478313f",
+      "name": "final_menssage_voice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "847641e5-9b22-4f0f-8ec9-63b887b01458",
+              "name": "final_message",
+              "value": "={{ $json.text_message }}",
+              "type": "string"
+            },
+            {
+              "id": "7118c01d-f9b9-4185-b9b5-4df156a8061b",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1136,
+        -240
+      ],
+      "id": "18a1aafd-0b4c-470e-9628-be4c9ac332c2",
+      "name": "final_menssage_txt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.concat_mesage }}",
+        "options": {
+          "systemMessage": "=━━━━━━━━━━━━━━\nROL\n━━━━━━━━━━━━━━\n\nEres el asistente virtual profesional de Extracta Laboratorio de Análisis y Control de Calidad S.A. de C.V.\n\nAtiendes clientes mediante WhatsApp de forma profesional, amable y natural.\n\nLa fecha y hora actual es:\n{{ $now.setZone('America/Mexico_City') }}\n\nTu función es comprender la intención del cliente, utilizar las herramientas disponibles cuando sea necesario y responder utilizando únicamente información oficial de Extracta.\n\nNunca inventes información.\n\n━━━━━━━━━━━━━━\nOBJETIVO\n━━━━━━━━━━━━━━\n\nTu objetivo principal es ayudar al cliente.\n\nNo te limites a responder preguntas.\n\nTambién debes orientar al cliente para identificar el servicio más adecuado según sus necesidades.\n\nAntes de responder:\n\n• Comprende la intención del cliente.\n• Determina si necesitas utilizar una o varias herramientas.\n• Obtén la información necesaria.\n• Construye una respuesta clara, útil y natural.\n\n━━━━━━━━━━━━━━\nHERRAMIENTAS\n━━━━━━━━━━━━━━\n\n1. Centro Operativo\n\nEs la fuente oficial de conocimiento de Extracta.\n\nUtilízalo siempre que el cliente solicite información relacionada con:\n\n• Servicios\n• Paquetes\n• Análisis\n• Precios\n• Requisitos de muestras\n• Horarios\n• Métodos de pago\n• Facturación\n• Certificaciones\n• Políticas\n• Cobertura\n• Contacto\n• Ubicación\n• Información institucional\n\nAl consultar esta herramienta:\n\n• Utiliza únicamente palabras clave o frases cortas.\n• Nunca envíes preguntas completas.\n\nEjemplos:\n\n• horario\n• paquete 1\n• metanol\n• precios\n• factura\n• ubicación\n• teléfono\n\n━━━━━━━━━━━━━━\n\n2. Obtener Cliente para Asesor\n\nUtilízala únicamente cuando el cliente solicite información relacionada con:\n\n• Resultados\n• Estado de resultados\n• Pagos\n• Estado de pagos\n• Seguimiento de muestras\n• Seguimiento de análisis\n\nSi el cliente aún no proporciona un dato para identificarse, solicita únicamente uno de los siguientes:\n\n• Razón social\n• Correo electrónico\n• Número telefónico\n\nNunca intentes validar clientes utilizando conocimiento propio.\n\nLa validación siempre debe realizarse mediante esta herramienta.\n\n━━━━━━━━━━━━━━\n\n3. Respuestas Fijas\n\nUtilízala únicamente para obtener mensajes institucionales.\n\nLos mensajes disponibles son:\n\n• TRANSFERENCIA_EXITOSA\n• CLIENTE_NO_ENCONTRADO\n• SOLO_EXTRACTA\n• ERROR_GENERAL\n\nNunca escribas estos mensajes manualmente.\n\n━━━━━━━━━━━━━━\nREGLAS DE NEGOCIO\n━━━━━━━━━━━━━━\n\nSi una herramienta contiene la información necesaria para responder, debes utilizarla antes de responder.\n\nNunca respondas utilizando conocimiento propio cuando la información pueda obtenerse mediante una herramienta.\n\nPuedes utilizar varias herramientas durante la misma conversación cuando sea necesario.\n\nUtiliza siempre el contexto de la conversación.\n\nEl contexto de la conversación te ayuda a comprender a qué se refiere el cliente.\n\nSin embargo, cuando necesites responder con información oficial de Extracta, consulta nuevamente el Centro Operativo antes de responder.\n\nNo asumas que recuerdas exactamente la información obtenida anteriormente.\n━━━━━━━━━━━━━━\nRECOMENDACIÓN DE SERVICIOS\n━━━━━━━━━━━━━━\n\nCuando un cliente solicite orientación para elegir un servicio:\n\nPrimero determina si cuentas con información suficiente.\n\nSi existen varias opciones posibles:\n\nRealiza únicamente una pregunta para comprender mejor la necesidad del cliente antes de recomendar un servicio.\n\nEjemplos:\n\n• ¿Qué tipo de bebida deseas analizar?\n• ¿Buscas una certificación oficial o únicamente conocer la composición de tu producto?\n\nNo asumas automáticamente qué servicio necesita el cliente.\n\nCuando ya cuentes con la información suficiente:\n\n• Recomienda el servicio más adecuado.\n• Explica brevemente por qué lo recomiendas.\n\n━━━━━━━━━━━━━━\nUSO DEL CENTRO OPERATIVO\n━━━━━━━━━━━━━━\n\nToda la información obtenida del Centro Operativo debe considerarse información oficial de Extracta.\n\nAl utilizar dicha información:\n\n• Conserva los nombres oficiales de los servicios.\n• Conserva los nombres oficiales de los análisis.\n• Conserva los nombres oficiales de los paquetes.\n• No traduzcas términos.\n• No cambies nombres.\n• No inventes nombres más descriptivos.\n\nCuando el Centro Operativo devuelva listas de análisis, requisitos o características de un servicio:\n\nPreséntalas completas.\n\nNo omitas información importante.\n\nPuedes reorganizar el texto para mejorar su lectura, pero nunca modificar su significado.\n\n━━━━━━━━━━━━━━\nTRANSFERENCIA A ASESOR\n━━━━━━━━━━━━━━\n\nCuando la herramienta \"Obtener Cliente para Asesor\" valide correctamente al cliente:\n\n• No muestres información obtenida mediante la herramienta.\n• No reveles datos internos.\n• No respondas consultas sobre resultados.\n• No respondas consultas sobre pagos.\n• No continúes proporcionando información del expediente.\n\nObtén el mensaje TRANSFERENCIA_EXITOSA desde la herramienta \"Respuestas Fijas\" y envíalo exactamente como fue recibido.\n\n━━━━━━━━━━━━━━\nCONFIDENCIALIDAD\n━━━━━━━━━━━━━━\n\nNunca reveles información privada obtenida mediante las herramientas.\n\nNunca muestres:\n\n• Resultados\n• Pagos\n• Folios\n• Correos electrónicos\n• Teléfonos\n• Información interna\n• Información de otros clientes\n\n━━━━━━━━━━━━━━\nALCANCE\n━━━━━━━━━━━━━━\n\nAtiende únicamente consultas relacionadas con Extracta.\n\nSi el usuario solicita información ajena al laboratorio:\n\nObtén el mensaje SOLO_EXTRACTA desde la herramienta \"Respuestas Fijas\".\n\n━━━━━━━━━━━━━━\nFORMATO DE RESPUESTA\n━━━━━━━━━━━━━━\n\nTodas las respuestas dirigidas al cliente deben:\n\n• Estar escritas en español.\n• Mantener un tono profesional, amable y natural.\n• Ser fáciles de leer desde WhatsApp.\n• Utilizar títulos únicamente cuando aporten claridad.\n• Separar las ideas mediante líneas en blanco.\n• Utilizar listas cuando sea útil.\n• Resaltar únicamente la información importante utilizando negritas.\n• Utilizar como máximo dos emojis por mensaje.\n• Evitar párrafos largos.\n• No utilizar tablas.\n• No utilizar JSON.\n• No utilizar bloques de código.\n\nCuando necesites información adicional del cliente:\n\nRealiza únicamente una pregunta a la vez."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        -208
+      ],
+      "id": "dbcf3be5-9034-4943-8753-6c82e9e20c39",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        368
+      ],
+      "id": "19f13c68-6eb7-459d-85f6-c2becc2c960d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qPMtAeHWaAkSpZgX",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('data_message_extraction').item.json.sender }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        1024,
+        384
+      ],
+      "id": "6ece114c-8665-4148-83a9-cc51ce4aec95",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Clientes"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1152,
+        704
+      ],
+      "id": "a9da82bf-0c2b-4ee1-bba2-312ab92d2f5f",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "bd_clientes",
+          "mode": "list",
+          "cachedResultName": "bd_clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio": "={{ $json.Folio }}",
+            "razon_social": "={{ $json.Razon_Social }}",
+            "telefono": "={{ $json.Telefono }}",
+            "correo": "={{ $json.Correo }}",
+            "materia_prima": "={{ $json.Materia_Prima }}",
+            "estatus_pago": "={{ $json.Estatus_Pago }}",
+            "aplica_convenio": "={{ $json.Aplica_Convenio }}"
+          },
+          "matchingColumns": [
+            "folio"
+          ],
+          "schema": [
+            {
+              "id": "folio",
+              "displayName": "folio",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "razon_social",
+              "displayName": "razon_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "correo",
+              "displayName": "correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "materia_prima",
+              "displayName": "materia_prima",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "estatus_pago",
+              "displayName": "estatus_pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "aplica_convenio",
+              "displayName": "aplica_convenio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -944,
+        704
+      ],
+      "id": "1997d358-27b9-4757-81a6-3aad55133a70",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        1104
+      ],
+      "id": "3b6a61bb-29e3-4a82-b985-916d4cafbe96",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.voice_message }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAfy1IbkWtwBRRAq7QvkUwZCJtxArhZBETqCvTRSH3yZCdnvwWcPd4MUDOusrH9DwfRkeEfocZBRyXduUKP3oJH7DmiitZCCoAEkFZAeLlrNqBwBB8mbG9SP3qvyBObdAxT3iFG8rP7PymDEKdmspk9ZCjYJnqpAK4hAZBpp1lYv5R3N9KCIDR2yu8eUmdfqvgZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"key\": {\n      \"id\": \"{{ $json.voice_message }}\"\n    }\n  },\n  \"convertToMp4\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1696,
+        -48
+      ],
+      "id": "6c376d17-f52b-4a20-ac3f-22ec19d798fa",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('data_message_extraction').item.json.sender }}",
+        "messageData": "={{ JSON.stringify( { 'message': $json.final_message, 'sessionId': $('data_message_extraction').item.json.sessionId, 'date_time': $('data_message_extraction').item.json.data_time } ) }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -160
+      ],
+      "id": "1e3c31cf-f944-4d7e-b323-7ed5ddd8b94d",
+      "name": "buffer",
+      "credentials": {
+        "redis": {
+          "id": "JfOdf7Eu03ZkAwGh",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('data_message_extraction').item.json.sender }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -160
+      ],
+      "id": "3533b82c-547d-472c-a8ef-400e38e2ade9",
+      "name": "get_buffer_data ",
+      "credentials": {
+        "redis": {
+          "id": "JfOdf7Eu03ZkAwGh",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.message.last()).sessionId }}",
+                    "rightValue": "={{ $('data_message_extraction').item.json.sessionId }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "78e5f486-7430-4b42-a2bc-9be05ae7acdd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "= Ignorar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "da8b3ad4-8b8f-49c2-886e-b173f750a9c4",
+                    "leftValue": "={{ JSON.parse($json.message.last()).date_time  }}",
+                    "rightValue": "={{ $now.minus(15,'seconds').toLocal() }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Continuar "
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Esperar"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -144,
+        -208
+      ],
+      "id": "666c5b78-5a6c-4231-a5fc-ea83e046d29e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -112,
+        16
+      ],
+      "id": "065d1976-9e4b-4047-9f2a-0c36f74d8ca3",
+      "name": "Wait",
+      "webhookId": "baeb1fb9-2860-4023-abdf-0a1cb4444fe2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -416
+      ],
+      "id": "5ce40730-0d8d-4db7-a92f-efc2c9b0d6fc",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('data_message_extraction').item.json.sender }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -192
+      ],
+      "id": "e45f6e9a-5867-4d46-aa3b-1deb043db0d8",
+      "name": "delete_buffer",
+      "credentials": {
+        "redis": {
+          "id": "JfOdf7Eu03ZkAwGh",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c399638a-3633-4ecc-9b1d-e709b13c29c5",
+              "name": "concat_mesage",
+              "value": "={{ $json.message.map(m=> JSON.parse(m).message).join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "5fece531-f2ef-4578-b4bc-b2f5e8825245",
+              "name": "sessionId",
+              "value": "={{ $('data_message_extraction').item.json.sender }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -192
+      ],
+      "id": "6e823efe-6887-451a-9e38-a1987ac8b8d0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAfy1IbkWtwBRRAq7QvkUwZCJtxArhZBETqCvTRSH3yZCdnvwWcPd4MUDOusrH9DwfRkeEfocZBRyXduUKP3oJH7DmiitZCCoAEkFZAeLlrNqBwBB8mbG9SP3qvyBObdAxT3iFG8rP7PymDEKdmspk9ZCjYJnqpAK4hAZBpp1lYv5R3N9KCIDR2yu8eUmdfqvgZDZD"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "=file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1312,
+        -48
+      ],
+      "id": "6f40c35b-9763-48b8-b48d-20d47935ebb0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1120986437770389",
+        "recipientPhoneNumber": "={{ $('Webhook').item.json.body.conversation.messages[0].sender.phone_number }}",
+        "textBody": "={{$json.output}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        2496,
+        -192
+      ],
+      "id": "280de0c6-f85d-4122-ae3b-35489d9f6781",
+      "name": "Send message",
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "K9lyNrB11N8Ly5Pa",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3c279abc-9774-438c-be82-99a24eaf7992",
+              "leftValue": "={{ $json.businessHours }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        -192
+      ],
+      "id": "526f4530-ffa1-4b84-8f7f-b6e5a2c46a37",
+      "name": "horario de atencion"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51e85e85-6e6c-45e0-86fa-18c8fe2124e9",
+              "name": "HorarioAtencion",
+              "value": "🕒 Gracias por comunicarte con Extracta.  Nuestro horario de atención es:  📅 Lunes a Viernes 🕗 8:00 a.m. a 5:00 p.m.  Hemos recibido tu mensaje y será atendido en cuanto nuestro personal se encuentre disponible.  Gracias por tu comprensión. 🧪",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        64
+      ],
+      "id": "e88ae452-b6d1-471a-bf21-d36a943a5cf2",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst mexicoTime = new Intl.DateTimeFormat('en-US', {\n  timeZone: 'America/Mexico_City',\n  weekday: 'short',\n  hour: 'numeric',\n  hour12: false\n}).formatToParts(now);\n\nconst day = mexicoTime.find(x => x.type === 'weekday').value;\nconst hour = parseInt(\n  mexicoTime.find(x => x.type === 'hour').value\n);\n\nconst businessHours =\n  ['Mon','Tue','Wed','Thu','Fri'].includes(day) &&\n  hour >= 8 &&\n  hour < 17;\n\nfor (const item of $input.all()) {\n  item.json.businessHours = businessHours;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -192
+      ],
+      "id": "e8590fda-1304-45c5-96a7-5d9ef54b5aef",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1120986437770389",
+        "recipientPhoneNumber": "529518826439",
+        "textBody": "={{ $json.HorarioAtencion }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        64
+      ],
+      "id": "256484a0-40f9-4d22-a5f0-b1951a0a5fba",
+      "name": "Send message2",
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "K9lyNrB11N8Ly5Pa",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bc80c3e2-f9ea-432b-8518-249f2810e415",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -4096,
+        -112
+      ],
+      "id": "d1970fff-363f-4a4e-b492-c8a5eeef2bff",
+      "name": "Webhook",
+      "webhookId": "bc80c3e2-f9ea-432b-8518-249f2810e415"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4fb67532-c49f-4f71-b622-f062fc145c56",
+              "name": "sender",
+              "value": "={{ $json.originalData.body.conversation.messages[0].sender.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "2f951c2e-b6f0-42bf-a34d-0f894b3f68e8",
+              "name": "sessionId",
+              "value": "={{ $json.originalData.body.conversation.messages[0].sender.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "c73cf981-4d80-4297-8033-e9432a44b440",
+              "name": "text_message",
+              "value": "={{ $json.originalData.body.content }}",
+              "type": "string"
+            },
+            {
+              "id": "2039b944-80c0-4674-b91f-739f47e99876",
+              "name": "messageType",
+              "value": "=text",
+              "type": "string"
+            },
+            {
+              "id": "3377cf87-c8ad-4981-bf70-e2b826e02bb8",
+              "name": "data_time",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "63f1e365-4ca7-4b4f-96ce-77debc63e474",
+              "name": "voice_message",
+              "value": "={{ $json.originalData.body.conversation.messages[0].attachments[0].data_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2528,
+        -112
+      ],
+      "id": "7971beff-1768-4f1a-a232-ac70fa9dbd66",
+      "name": "data_message_extraction"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nreturn {\n  json: {\n    messageType: data.voice_message ? 'audio' : 'text',\n    text_message: data.text_message,\n    voice_message: data.voice_message,\n    conversation: data.conversation,\n    sender: data.sender,\n    sessionId: data.sessionId,\n    data_time: data.data_time\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2224,
+        -112
+      ],
+      "id": "99e01209-1ea6-4ef9-897f-c4b61064527a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=human_mode:human_mode:{{ $json.body.conversation.contact_inbox.source_id }}",
+        "value": "true",
+        "expire": true,
+        "ttl": 180
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -3408,
+        176
+      ],
+      "id": "aa6d3347-33cc-4de6-a7a7-cb691c47e675",
+      "name": "set_human_mode",
+      "credentials": {
+        "redis": {
+          "id": "JfOdf7Eu03ZkAwGh",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "26b6f2a9-41f0-41c2-9f19-6a3b3e62c7bc",
+              "leftValue": "={{ $json.body.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3872,
+        -112
+      ],
+      "id": "a1be772f-b220-4b1e-93bc-eb6f6ff5ad48",
+      "name": "msg_from_client"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const phone = $json.body.conversation.contact_inbox.source_id;\n\nreturn {\n  json: {\n    phone,\nredisKey: `human_mode:human_mode:${phone}`,    originalData: $json\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3616,
+        -144
+      ],
+      "id": "75284250-b75d-4671-aad8-3de8e3a9ee52",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "74f04f54-c2e0-4ec0-90c4-aa0dd492332b",
+              "leftValue": "={{ $json.propertyName }}",
+              "rightValue": {},
+              "operator": {
+                "type": "boolean",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2944,
+        -128
+      ],
+      "id": "ffaee2ac-09ff-4e64-82dc-115758683102",
+      "name": "human_mode_active"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        -288
+      ],
+      "id": "7d800ae1-59aa-4732-8c6b-c596e1928b4e",
+      "name": "stop_human_mode"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $json.redisKey }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -3408,
+        -144
+      ],
+      "id": "d6f180ba-f2ea-4d04-9f30-0a99844b16c2",
+      "name": "get",
+      "credentials": {
+        "redis": {
+          "id": "JfOdf7Eu03ZkAwGh",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3168,
+        -128
+      ],
+      "id": "027288d3-0236-4285-b3b9-2a0680b176cf",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta únicamente cuando el cliente proporcione una razón social, nombre de empresa o parte del nombre de la empresa.\n\nEjemplos:\n\n• DESTILERIA MIXTECA SA DE CV\n• Mixteca\n• Destilería Mixteca\n\nSirve para localizar clientes registrados mediante coincidencias en la razón social.",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "bd_clientes",
+          "mode": "list",
+          "cachedResultName": "bd_clientes"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "razon_social",
+              "condition": "LIKE",
+              "value": "={{ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        1296,
+        432
+      ],
+      "id": "65ef4ace-8c76-45cb-aba3-0b3a0589d5f1",
+      "name": "Buscar cliente por razón social",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta únicamente cuando el cliente proporcione un número telefónico registrado.\n\nEjemplos:\n\n• 529518826354\n• 9511648812\n\nSirve para localizar clientes registrados mediante su número telefónico.\n\nNo la uses para razones sociales ni correos electrónicos.\n\nSi encuentras un registro, no muestres información interna al cliente. Simplemente confirma que la solicitud fue localizada y continúa el proceso de atención.\n",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "bd_clientes",
+          "mode": "list",
+          "cachedResultName": "bd_clientes"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "telefono",
+              "value": "={{ $fromAI('telefono', '', 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        1152,
+        432
+      ],
+      "id": "33a9f64e-ce7d-46be-b99c-9950078880ee",
+      "name": "Buscar cliente por teléfono",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usa esta herramienta únicamente cuando el cliente proporcione una dirección de correo electrónico registrada.\n\nEjemplos:\n\n• [cliente@gmail.com](mailto:cliente@gmail.com)\n• [contacto@empresa.com](mailto:contacto@empresa.com)\n\nSirve para localizar clientes registrados mediante correo electrónico.\n\nNo la uses para razones sociales ni teléfonos.\n\nSi encuentras un registro, no muestres información interna al cliente. Simplemente confirma que la solicitud fue localizada y continúa el proceso de atención.\n",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "bd_clientes",
+          "mode": "list",
+          "cachedResultName": "bd_clientes"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "correo",
+              "value": "={{ $fromAI('correo', '', 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        1440,
+        432
+      ],
+      "id": "8f6c96b0-3c24-43a9-8cdf-69cc72bfeded",
+      "name": "Buscar cliente por correo",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.estadian8n.ninja/api/v1/accounts/1/conversations/1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "zoF18aZH4DVGLS2X2QrXmMoA"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "private",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3152,
+        -352
+      ],
+      "id": "e293ee49-bbcf-449e-8eb1-0de2422f32d9",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1a051ef5-698d-4dcb-b316-a105c63c40c9",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "He localizado tu solicitud",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2032,
+        -208
+      ],
+      "id": "31f43995-0c3d-42ff-b059-0b43f323959e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "bd_clientes",
+          "mode": "list",
+          "cachedResultName": "bd_clientes"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "telefono",
+              "value": "={{ '52' + $('horario de atencion').item.json.sessionId.replace('+521','') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2256,
+        -352
+      ],
+      "id": "a1a74a0f-7dc4-4fef-9f21-28945f8c7179",
+      "name": "Obtener cliente para asesor",
+      "alwaysOutputData": true,
+      "notesInFlow": false,
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d174886-dacb-4f6f-b166-c46de9c1b429",
+              "name": "=nota_privada",
+              "value": "={{ \n'📋 Cliente identificado\\n\\n' +\n'Razón social: ' + $json.razon_social + '\\n' +\n'Folio: ' + $json.folio + '\\n' +\n'Teléfono: ' + $json.telefono + '\\n' +\n'Correo: ' + $json.correo + '\\n' +\n'Materia prima: ' + $json.materia_prima + '\\n' +\n'Estatus de pago: ' + $json.estatus_pago + '\\n' +\n'Aplica convenio: ' + $json.aplica_convenio + '\\n\\n' +\n'Motivo: Consulta de resultados\\n\\n' +\n'Conversación transferida a asesor.'\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        -352
+      ],
+      "id": "4f2f9575-b563-40a2-87ae-add688cf3138",
+      "name": "nota_privada1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    content: $json.nota_privada\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        -352
+      ],
+      "id": "2278cbb0-ea08-4d8f-88cf-0da6537cf02a",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1008,
+        2368
+      ],
+      "id": "911ce17b-f46d-4f84-9d98-b68fcf39005a",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "bd_clientes",
+          "mode": "list",
+          "cachedResultName": "bd_clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio": "={{ $json.Folio }}",
+            "razon_social": "={{ $json.Razon_Social }}",
+            "telefono": "={{ $json.Telefono }}",
+            "correo": "={{ $json.Correo }}",
+            "materia_prima": "={{ $json.Materia_Prima }}",
+            "estatus_pago": "={{ $json.Estatus_Pago }}",
+            "aplica_convenio": "={{ $json.Aplica_Convenio }}"
+          },
+          "matchingColumns": [
+            "folio"
+          ],
+          "schema": [
+            {
+              "id": "folio",
+              "displayName": "folio",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "razon_social",
+              "displayName": "razon_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "correo",
+              "displayName": "correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "materia_prima",
+              "displayName": "materia_prima",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "estatus_pago",
+              "displayName": "estatus_pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "aplica_convenio",
+              "displayName": "aplica_convenio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -800,
+        2368
+      ],
+      "id": "5a06f188-f85c-4a7a-ace4-88e55ea1d084",
+      "name": "Insert or update rows in a table1",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1264,
+        2400
+      ],
+      "id": "3b02f05a-ab52-43d9-9663-abaf72d1706b",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        2560
+      ],
+      "id": "9639b41a-7133-44bb-9b4c-553f2a2544e4",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1360,
+        1504
+      ],
+      "id": "92612453-df83-4a9e-95c0-05fcbfa16a8a",
+      "name": "Catálogo",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1328,
+        704
+      ],
+      "id": "787e3798-0c76-4daf-afe5-8a8ff10f62d3",
+      "name": "Download clientes",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Catalogo_Operativo"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1184,
+        1504
+      ],
+      "id": "43cfb99e-5119-4745-94cf-9c1511c5f7f9",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "catalogo_operativo",
+          "mode": "list",
+          "cachedResultName": "catalogo_operativo"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "codigo": "={{ $json.codigo }}",
+            "categoria": "={{ $json.categoria }}",
+            "subcategoria": "={{ $json.subcategoria }}",
+            "titulo": "={{ $json.titulo }}",
+            "contenido": "={{ $json.contenido }}",
+            "palabras_clave": "={{ $json.palabras_clave }}",
+            "prioridad": "={{ $json.prioridad }}",
+            "activo": "={{ $json.activo }}"
+          },
+          "matchingColumns": [
+            "codigo"
+          ],
+          "schema": [
+            {
+              "id": "codigo",
+              "displayName": "codigo",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "subcategoria",
+              "displayName": "subcategoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "contenido",
+              "displayName": "contenido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "palabras_clave",
+              "displayName": "palabras_clave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "prioridad",
+              "displayName": "prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "activo",
+              "displayName": "activo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -944,
+        1504
+      ],
+      "id": "2dede739-c110-415d-9600-1b3995b2cbc0",
+      "name": "Insert or update rows in a table2",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Intenciones"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        896
+      ],
+      "id": "aebeadcb-111d-487d-ae84-c8117bea5383",
+      "name": "Extract from File3"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "intenciones",
+          "mode": "list",
+          "cachedResultName": "intenciones"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "requiere_cliente": "={{ $json.requiere_cliente }}",
+            "requiere_transferencia": "={{ $json.requiere_transferencia }}",
+            "consultar_catalogo": "={{ $json.consultar_catalogo }}",
+            "activo": "={{ $json.activo }}",
+            "intencion": "={{ $json.intencion }}",
+            "descripcion": "={{ $json.descripcion }}",
+            "categoria": "={{ $json.categoria }}"
+          },
+          "matchingColumns": [
+            "intencion"
+          ],
+          "schema": [
+            {
+              "id": "intencion",
+              "displayName": "intencion",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "descripcion",
+              "displayName": "descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "requiere_cliente",
+              "displayName": "requiere_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "requiere_transferencia",
+              "displayName": "requiere_transferencia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "consultar_catalogo",
+              "displayName": "consultar_catalogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "activo",
+              "displayName": "activo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -912,
+        896
+      ],
+      "id": "c3ea17c0-5a3a-4135-9c29-82e15dc55c15",
+      "name": "Insert or update rows in a table3",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1296,
+        896
+      ],
+      "id": "b5727824-6d43-4953-8f33-df9dcd1978c9",
+      "name": "Download intenciones",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Respuestas_Fijas"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        1312
+      ],
+      "id": "be1a2098-ca4e-4d5d-8958-f3fb9452c587",
+      "name": "Extract from File4"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "respuestas_fijas",
+          "mode": "list",
+          "cachedResultName": "respuestas_fijas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "activo": "={{ $json.activo }}",
+            "codigo": "={{ $json.codigo }}",
+            "mensaje": "={{ $json.mensaje }}"
+          },
+          "matchingColumns": [
+            "codigo"
+          ],
+          "schema": [
+            {
+              "id": "codigo",
+              "displayName": "codigo",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mensaje",
+              "displayName": "mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "activo",
+              "displayName": "activo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -912,
+        1312
+      ],
+      "id": "47bc91f5-d51e-4684-81c9-c88aa00b58f4",
+      "name": "Insert or update rows in a table4",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Configuracion"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1136,
+        1104
+      ],
+      "id": "6ac1b16f-8a9e-4544-8bbc-dcd647a06503",
+      "name": "Extract from File6"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "configuracion",
+          "mode": "list",
+          "cachedResultName": "configuracion"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "activo": "={{ $json.activo }}",
+            "clave": "={{ $json.clave }}",
+            "valor": "={{ $json.valor }}",
+            "descripcion": "={{ $json.descripcion }}"
+          },
+          "matchingColumns": [
+            "clave"
+          ],
+          "schema": [
+            {
+              "id": "clave",
+              "displayName": "clave",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "valor",
+              "displayName": "valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "descripcion",
+              "displayName": "descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "activo",
+              "displayName": "activo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -928,
+        1104
+      ],
+      "id": "cd1254f0-cba2-44fd-9b46-b8e560e65e4c",
+      "name": "Insert or update rows in a table6",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    codigo,\n    categoria,\n    subcategoria,\n    titulo,\n    contenido\nFROM catalogo_operativo\nWHERE activo = TRUE\nAND (\n    categoria ILIKE '%' || $1 || '%'\n    OR subcategoria ILIKE '%' || $1 || '%'\n    OR titulo ILIKE '%' || $1 || '%'\n    OR palabras_clave ILIKE '%' || $1 || '%'\n)\nORDER BY prioridad ASC\nLIMIT 5;",
+        "options": {
+          "queryReplacement": "={{ [$fromAI('busqueda', 'Palabra o frase corta que describa la información que deseas buscar.', 'string')] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        1568,
+        512
+      ],
+      "id": "a1f795ea-099a-435b-8575-02768f14be2d",
+      "name": "Centro Operativo",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    codigo,\n    mensaje\nFROM respuestas_fijas\nWHERE activo = TRUE\nAND codigo = $1\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ [$fromAI('codigo', 'Código de la respuesta fija que deseas obtener. Ejemplos: SALUDO, TRANSFERENCIA_EXITOSA, CLIENTE_NO_ENCONTRADO, SOLO_EXTRACTA, ERROR_GENERAL', 'string')] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        1728,
+        528
+      ],
+      "id": "fad569e3-4364-4c8a-8952-c81ec27e6005",
+      "name": "Respuestas Fijas",
+      "credentials": {
+        "postgres": {
+          "id": "Ce01AsYVQqWsHhSa",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1296,
+        1312
+      ],
+      "id": "5bae355c-cc01-4d44-91c8-2cc1fa29fcf2",
+      "name": "Download Respuestas_Fijas",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw",
+          "mode": "list",
+          "cachedResultName": "base_madre_pruebas.xlsx",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UhNOsPi1Y0KkSwfie0BaPZG7xgF6DLmw/edit?usp=drivesdk&ouid=108948315273782311771&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1312,
+        1104
+      ],
+      "id": "bb4ed166-9db4-446f-80f0-2ccc5053dfc5",
+      "name": "Download Configuracion",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cDapNszbC7uduj2R",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "final_menssage_txt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "final_menssage_voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final_menssage_voice": {
+      "main": [
+        [
+          {
+            "node": "buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final_menssage_txt": {
+      "main": [
+        [
+          {
+            "node": "buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download clientes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Catálogo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download intenciones",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download Respuestas_Fijas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download Configuracion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buffer": {
+      "main": [
+        [
+          {
+            "node": "get_buffer_data ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_buffer_data ": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "delete_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "get_buffer_data ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete_buffer": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "horario de atencion": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "horario de atencion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "msg_from_client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data_message_extraction": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_human_mode": {
+      "main": [
+        []
+      ]
+    },
+    "msg_from_client": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_human_mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "get",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "human_mode_active": {
+      "main": [
+        [
+          {
+            "node": "stop_human_mode",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "data_message_extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "human_mode_active",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar cliente por razón social": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar cliente por teléfono": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar cliente por correo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Obtener cliente para asesor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener cliente para asesor": {
+      "main": [
+        [
+          {
+            "node": "nota_privada1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nota_privada1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Download file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download clientes": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catálogo": {
+      "main": [
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File3": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download intenciones": {
+      "main": [
+        [
+          {
+            "node": "Extract from File3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File4": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File6": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Centro Operativo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuestas Fijas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Respuestas_Fijas": {
+      "main": [
+        [
+          {
+            "node": "Extract from File4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Configuracion": {
+      "main": [
+        [
+          {
+            "node": "Extract from File6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "474c5b9a-1cfb-47ef-9ba5-dbb1ae0878d1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "162d13affcb6993a63be37efb1b3308446c484df77b4374ab2424b91b90a9f5b"
+  },
+  "id": "StEoh38GmLfROHoU",
+  "tags": []
+}

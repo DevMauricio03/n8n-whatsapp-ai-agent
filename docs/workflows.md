@@ -1,6 +1,6 @@
 # Workflows de n8n
 
-El repositorio incluye [un workflow de ejemplo saneado](../workflows/atencion-whatsapp-principal.example.json). Se entrega desactivado y sin credenciales asignadas.
+El repositorio incluye [un workflow de ejemplo saneado](../workflows/My%20workflow%202.json). Se entrega desactivado y sin credenciales asignadas.
 
 ## Dependencias
 
@@ -74,24 +74,14 @@ El agente:
 
 ## Sincronización de datos
 
-El mismo archivo contiene una rama que observa un XLSX de Google Drive:
+El mismo archivo contiene una rama que observa un XLSX de Google Drive (Centro Operativo):
 
-1. detecta cambios;
+1. detecta cambios en el archivo matriz;
 2. descarga el archivo;
-3. extrae las filas;
-4. ejecuta un `upsert` por `folio` en `bd_clientes`.
+3. extrae las filas de múltiples hojas (`Clientes`, `Catalogo_Operativo`, `Intenciones`, `Respuestas_Fijas`, `Configuracion`);
+4. ejecuta un `upsert` en sus respectivas tablas en PostgreSQL.
 
-El encabezado esperado del archivo es:
-
-| Columna XLSX | Campo PostgreSQL |
-|---|---|
-| `Folio` | `folio` |
-| `Razon_Social` | `razon_social` |
-| `Telefono` | `telefono` |
-| `Correo` | `correo` |
-| `Materia_Prima` | `materia_prima` |
-| `Estatus_Pago` | `estatus_pago` |
-| `Aplica_Convenio` | `aplica_convenio` |
+Esto convierte a la base de datos en la principal fuente de conocimiento oficial para el agente. El rediseño del Centro Operativo organiza la información por categorías, mejorando las búsquedas y separando la configuración institucional del prompt principal.
 
 ## Importación segura
 

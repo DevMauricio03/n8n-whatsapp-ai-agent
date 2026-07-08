@@ -55,7 +55,7 @@ Después:
 2. Revisa las versiones de imágenes y prueba la actualización en un entorno no productivo.
 3. Desde la raíz, valida con `docker compose --env-file .env -f docker/docker-compose.yml config`.
 4. Inicia con `docker compose --env-file .env -f docker/docker-compose.yml up -d`.
-5. Importa [el workflow saneado](workflows/atencion-whatsapp-principal.example.json).
+5. Importa [el workflow saneado](workflows/My%20workflow%202.json).
 6. Crea y asigna las credenciales dentro de n8n.
 7. Ejecuta el [plan de pruebas](docs/pruebas.md) antes de activar el workflow.
 
