@@ -22,3 +22,11 @@ backups/
 *.zip
 *.rar
 *.7z
+
+# Entornos virtuales de Python
+.venv/
+
+# Documentos académicos temporales
+*.docx
+*.txt
+~$*

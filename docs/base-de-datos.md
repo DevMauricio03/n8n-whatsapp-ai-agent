@@ -12,6 +12,65 @@ PostgreSQL aloja tres bases lógicamente separadas:
 | `chatwoot` | Conversaciones, contactos y configuración |
 | `agent` | Datos empresariales y memoria conversacional |
 
+### Modelo de Datos de `agent` (Diagrama ER)
+
+A continuación, la estructura relacional de la base de datos operativa y conversacional del agente:
+
+```mermaid
+erDiagram
+    bd_clientes {
+        varchar(50) folio PK
+        varchar(255) razon_social
+        varchar(50) telefono
+        varchar(255) correo
+        varchar(255) materia_prima
+        varchar(50) estatus_pago
+        varchar(50) aplica_convenio
+    }
+
+    catalogo_operativo {
+        varchar(50) codigo PK
+        varchar(100) categoria
+        varchar(100) subcategoria
+        varchar(255) titulo
+        text contenido
+        text palabras_clave
+        int prioridad
+        boolean activo
+    }
+
+    configuracion {
+        varchar(100) clave PK
+        text valor
+        text descripcion
+        boolean activo
+    }
+
+    intenciones {
+        varchar(100) intencion PK
+        text descripcion
+        boolean requiere_cliente
+        boolean requiere_transferencia
+        boolean consultar_catalogo
+        varchar(100) categoria
+        boolean activo
+    }
+
+    n8n_chat_histories {
+        int id PK
+        varchar(255) session_id
+        jsonb message
+    }
+
+    respuestas_fijas {
+        varchar(100) codigo PK
+        text mensaje
+        boolean activo
+    }
+
+    intenciones }o--o{ catalogo_operativo : "filtra_por_categoria"
+```
+
 ## Tabla `bd_clientes`
 
 Se crea mediante [02-agent-schema.sql](../docker/initdb/02-agent-schema.sql).
