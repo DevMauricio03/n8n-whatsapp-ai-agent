@@ -21,7 +21,7 @@ erDiagram
     bd_clientes {
         varchar(50) folio PK
         varchar(255) razon_social
-        varchar(50) telefono
+        varchar(50) telefono UK "Usado como session_id"
         varchar(255) correo
         varchar(255) materia_prima
         varchar(50) estatus_pago
@@ -30,7 +30,7 @@ erDiagram
 
     catalogo_operativo {
         varchar(50) codigo PK
-        varchar(100) categoria
+        varchar(100) categoria FK
         varchar(100) subcategoria
         varchar(255) titulo
         text contenido
@@ -52,13 +52,13 @@ erDiagram
         boolean requiere_cliente
         boolean requiere_transferencia
         boolean consultar_catalogo
-        varchar(100) categoria
+        varchar(100) categoria FK
         boolean activo
     }
 
     n8n_chat_histories {
         int id PK
-        varchar(255) session_id
+        varchar(255) session_id FK
         jsonb message
     }
 
@@ -68,7 +68,9 @@ erDiagram
         boolean activo
     }
 
-    intenciones }o--o{ catalogo_operativo : "filtra_por_categoria"
+    %% Relaciones Lógicas (Llaves Foráneas Conceptuales)
+    bd_clientes ||--o{ n8n_chat_histories : "tiene historial (telefono = session_id)"
+    intenciones }|--|{ catalogo_operativo : "filtra búsqueda por (categoria)"
 ```
 
 ## Tabla `bd_clientes`
