@@ -73,6 +73,20 @@ erDiagram
     intenciones }|--|{ catalogo_operativo : "filtra búsqueda por (categoria)"
 ```
 
+### Relaciones Lógicas vs Tablas Globales
+
+En arquitecturas ágiles controladas por n8n e IA, es común utilizar conexiones lógicas (gestionadas por la lógica del flujo) en lugar de restricciones físicas (*Foreign Keys*) a nivel de motor de base de datos. 
+
+* **Conexiones Lógicas Fuertes:**
+  * **`bd_clientes` ↔ `n8n_chat_histories`:** Se enlazan conceptualmente mediante el número de teléfono. El campo `telefono` del cliente actúa como el `session_id` del historial de chat, permitiendo a la IA recuperar la memoria de esa conversación en específico.
+  * **`intenciones` ↔ `catalogo_operativo`:** Se enlazan a través del campo `categoria`. Cuando la IA clasifica la intención del usuario, utiliza su categoría para buscar información únicamente dentro de los registros del catálogo que comparten esa misma categoría, garantizando precisión en la respuesta.
+
+* **Tablas Globales (Sin relaciones explícitas):**
+  Existen tablas "sueltas" que funcionan como diccionarios de consulta general. No se enlazan con un usuario porque aplican para todo el sistema por igual:
+  * **`configuracion`:** Almacena parámetros globales del negocio (ej. horarios de atención).
+  * **`respuestas_fijas`:** Almacena plantillas estáticas de texto (ej. saludos o mensajes de error predefinidos). 
+  El sistema acude a estas tablas bajo demanda de manera aislada.
+
 ## Tabla `bd_clientes`
 
 Se crea mediante [02-agent-schema.sql](../docker/initdb/02-agent-schema.sql).
