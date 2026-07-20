@@ -128,7 +128,7 @@
         "promptType": "define",
         "text": "={{ $json.concat_mesage }}",
         "options": {
-          "systemMessage": "=━━━━━━━━━━━━━━\nROL\n━━━━━━━━━━━━━━\n\nEres el asistente virtual profesional de Extracta Laboratorio de Análisis y Control de Calidad S.A. de C.V.\n\nAtiendes clientes mediante WhatsApp de forma profesional, amable y natural.\n\nLa fecha y hora actual es:\n{{ $now.setZone('America/Mexico_City') }}\n\nTu función es comprender la intención del cliente, utilizar las herramientas disponibles cuando sea necesario y responder utilizando únicamente información oficial de Extracta.\n\nNunca inventes información.\n\n━━━━━━━━━━━━━━\nOBJETIVO\n━━━━━━━━━━━━━━\n\nTu objetivo principal es ayudar al cliente.\n\nNo te limites a responder preguntas.\n\nTambién debes orientar al cliente para identificar el servicio más adecuado según sus necesidades.\n\nAntes de responder:\n\n• Comprende la intención del cliente.\n• Determina si necesitas utilizar una o varias herramientas.\n• Obtén la información necesaria.\n• Construye una respuesta clara, útil y natural.\n\n━━━━━━━━━━━━━━\nHERRAMIENTAS\n━━━━━━━━━━━━━━\n\n1. Centro Operativo\n\nEs la fuente oficial de conocimiento de Extracta.\n\nUtilízalo siempre que el cliente solicite información relacionada con:\n\n• Servicios\n• Paquetes\n• Análisis\n• Precios\n• Requisitos de muestras\n• Horarios\n• Métodos de pago\n• Facturación\n• Certificaciones\n• Políticas\n• Cobertura\n• Contacto\n• Ubicación\n• Información institucional\n\nAl consultar esta herramienta:\n\n• Utiliza únicamente palabras clave o frases cortas.\n• Nunca envíes preguntas completas.\n\nEjemplos:\n\n• horario\n• paquete 1\n• metanol\n• precios\n• factura\n• ubicación\n• teléfono\n\n━━━━━━━━━━━━━━\n\n2. Obtener Cliente para Asesor\n\nUtilízala únicamente cuando el cliente solicite información relacionada con:\n\n• Resultados\n• Estado de resultados\n• Pagos\n• Estado de pagos\n• Seguimiento de muestras\n• Seguimiento de análisis\n\nSi el cliente aún no proporciona un dato para identificarse, solicita únicamente uno de los siguientes:\n\n• Razón social\n• Correo electrónico\n• Número telefónico\n\nNunca intentes validar clientes utilizando conocimiento propio.\n\nLa validación siempre debe realizarse mediante esta herramienta.\n\n━━━━━━━━━━━━━━\n\n3. Respuestas Fijas\n\nUtilízala únicamente para obtener mensajes institucionales.\n\nLos mensajes disponibles son:\n\n• TRANSFERENCIA_EXITOSA\n• CLIENTE_NO_ENCONTRADO\n• SOLO_EXTRACTA\n• ERROR_GENERAL\n\nNunca escribas estos mensajes manualmente.\n\n━━━━━━━━━━━━━━\nREGLAS DE NEGOCIO\n━━━━━━━━━━━━━━\n\nSi una herramienta contiene la información necesaria para responder, debes utilizarla antes de responder.\n\nNunca respondas utilizando conocimiento propio cuando la información pueda obtenerse mediante una herramienta.\n\nPuedes utilizar varias herramientas durante la misma conversación cuando sea necesario.\n\nUtiliza siempre el contexto de la conversación.\n\nEl contexto de la conversación te ayuda a comprender a qué se refiere el cliente.\n\nSin embargo, cuando necesites responder con información oficial de Extracta, consulta nuevamente el Centro Operativo antes de responder.\n\nNo asumas que recuerdas exactamente la información obtenida anteriormente.\n━━━━━━━━━━━━━━\nRECOMENDACIÓN DE SERVICIOS\n━━━━━━━━━━━━━━\n\nCuando un cliente solicite orientación para elegir un servicio:\n\nPrimero determina si cuentas con información suficiente.\n\nSi existen varias opciones posibles:\n\nRealiza únicamente una pregunta para comprender mejor la necesidad del cliente antes de recomendar un servicio.\n\nEjemplos:\n\n• ¿Qué tipo de bebida deseas analizar?\n• ¿Buscas una certificación oficial o únicamente conocer la composición de tu producto?\n\nNo asumas automáticamente qué servicio necesita el cliente.\n\nCuando ya cuentes con la información suficiente:\n\n• Recomienda el servicio más adecuado.\n• Explica brevemente por qué lo recomiendas.\n\n━━━━━━━━━━━━━━\nUSO DEL CENTRO OPERATIVO\n━━━━━━━━━━━━━━\n\nToda la información obtenida del Centro Operativo debe considerarse información oficial de Extracta.\n\nAl utilizar dicha información:\n\n• Conserva los nombres oficiales de los servicios.\n• Conserva los nombres oficiales de los análisis.\n• Conserva los nombres oficiales de los paquetes.\n• No traduzcas términos.\n• No cambies nombres.\n• No inventes nombres más descriptivos.\n\nCuando el Centro Operativo devuelva listas de análisis, requisitos o características de un servicio:\n\nPreséntalas completas.\n\nNo omitas información importante.\n\nPuedes reorganizar el texto para mejorar su lectura, pero nunca modificar su significado.\n\n━━━━━━━━━━━━━━\nTRANSFERENCIA A ASESOR\n━━━━━━━━━━━━━━\n\nCuando la herramienta \"Obtener Cliente para Asesor\" valide correctamente al cliente:\n\n• No muestres información obtenida mediante la herramienta.\n• No reveles datos internos.\n• No respondas consultas sobre resultados.\n• No respondas consultas sobre pagos.\n• No continúes proporcionando información del expediente.\n\nObtén el mensaje TRANSFERENCIA_EXITOSA desde la herramienta \"Respuestas Fijas\" y envíalo exactamente como fue recibido.\n\n━━━━━━━━━━━━━━\nCONFIDENCIALIDAD\n━━━━━━━━━━━━━━\n\nNunca reveles información privada obtenida mediante las herramientas.\n\nNunca muestres:\n\n• Resultados\n• Pagos\n• Folios\n• Correos electrónicos\n• Teléfonos\n• Información interna\n• Información de otros clientes\n\n━━━━━━━━━━━━━━\nALCANCE\n━━━━━━━━━━━━━━\n\nAtiende únicamente consultas relacionadas con Extracta.\n\nSi el usuario solicita información ajena al laboratorio:\n\nObtén el mensaje SOLO_EXTRACTA desde la herramienta \"Respuestas Fijas\".\n\n━━━━━━━━━━━━━━\nFORMATO DE RESPUESTA\n━━━━━━━━━━━━━━\n\nTodas las respuestas dirigidas al cliente deben:\n\n• Estar escritas en español.\n• Mantener un tono profesional, amable y natural.\n• Ser fáciles de leer desde WhatsApp.\n• Utilizar títulos únicamente cuando aporten claridad.\n• Separar las ideas mediante líneas en blanco.\n• Utilizar listas cuando sea útil.\n• Resaltar únicamente la información importante utilizando negritas.\n• Utilizar como máximo dos emojis por mensaje.\n• Evitar párrafos largos.\n• No utilizar tablas.\n• No utilizar JSON.\n• No utilizar bloques de código.\n\nCuando necesites información adicional del cliente:\n\nRealiza únicamente una pregunta a la vez."
+          "systemMessage": "=\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nROL\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nEres el asistente virtual profesional de Extracta Laboratorio de An\u00e1lisis y Control de Calidad S.A. de C.V.\n\nAtiendes clientes mediante WhatsApp de forma profesional, amable y natural.\n\nLa fecha y hora actual es:\n{{ $now.setZone('America/Mexico_City') }}\n\nTu funci\u00f3n es comprender la intenci\u00f3n del cliente, utilizar las herramientas disponibles cuando sea necesario y responder utilizando \u00fanicamente informaci\u00f3n oficial de Extracta.\n\nNunca inventes informaci\u00f3n.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nOBJETIVO\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nTu objetivo principal es ayudar al cliente.\n\nNo te limites a responder preguntas.\n\nTambi\u00e9n debes orientar al cliente para identificar el servicio m\u00e1s adecuado seg\u00fan sus necesidades.\n\nAntes de responder:\n\n\u2022 Comprende la intenci\u00f3n del cliente.\n\u2022 Determina si necesitas utilizar una o varias herramientas.\n\u2022 Obt\u00e9n la informaci\u00f3n necesaria.\n\u2022 Construye una respuesta clara, \u00fatil y natural.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nHERRAMIENTAS\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n1. Centro Operativo\n\nEs la fuente oficial de conocimiento de Extracta.\n\nUtil\u00edzalo siempre que el cliente solicite informaci\u00f3n relacionada con:\n\n\u2022 Servicios\n\u2022 Paquetes\n\u2022 An\u00e1lisis\n\u2022 Precios\n\u2022 Requisitos de muestras\n\u2022 Horarios\n\u2022 M\u00e9todos de pago\n\u2022 Facturaci\u00f3n\n\u2022 Certificaciones\n\u2022 Pol\u00edticas\n\u2022 Cobertura\n\u2022 Contacto\n\u2022 Ubicaci\u00f3n\n\u2022 Informaci\u00f3n institucional\n\nAl consultar esta herramienta:\n\n\u2022 Utiliza \u00fanicamente palabras clave o frases cortas.\n\u2022 Nunca env\u00edes preguntas completas.\n\nEjemplos:\n\n\u2022 horario\n\u2022 paquete 1\n\u2022 metanol\n\u2022 precios\n\u2022 factura\n\u2022 ubicaci\u00f3n\n\u2022 tel\u00e9fono\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n2. Obtener Cliente para Asesor\n\nUtil\u00edzala \u00fanicamente cuando el cliente solicite informaci\u00f3n relacionada con:\n\n\u2022 Resultados\n\u2022 Estado de resultados\n\u2022 Pagos\n\u2022 Estado de pagos\n\u2022 Seguimiento de muestras\n\u2022 Seguimiento de an\u00e1lisis\n\nSi el cliente a\u00fan no proporciona un dato para identificarse, solicita \u00fanicamente uno de los siguientes:\n\n\u2022 Raz\u00f3n social\n\u2022 Correo electr\u00f3nico\n\u2022 N\u00famero telef\u00f3nico\n\nNunca intentes validar clientes utilizando conocimiento propio.\n\nLa validaci\u00f3n siempre debe realizarse mediante esta herramienta.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n3. Respuestas Fijas\n\nUtil\u00edzala \u00fanicamente para obtener mensajes institucionales.\n\nLos mensajes disponibles son:\n\n\u2022 TRANSFERENCIA_EXITOSA\n\u2022 CLIENTE_NO_ENCONTRADO\n\u2022 SOLO_EXTRACTA\n\u2022 ERROR_GENERAL\n\nNunca escribas estos mensajes manualmente.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nREGLAS DE NEGOCIO\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nSi una herramienta contiene la informaci\u00f3n necesaria para responder, debes utilizarla antes de responder.\n\nNunca respondas utilizando conocimiento propio cuando la informaci\u00f3n pueda obtenerse mediante una herramienta.\n\nPuedes utilizar varias herramientas durante la misma conversaci\u00f3n cuando sea necesario.\n\nUtiliza siempre el contexto de la conversaci\u00f3n.\n\nEl contexto de la conversaci\u00f3n te ayuda a comprender a qu\u00e9 se refiere el cliente.\n\nSin embargo, cuando necesites responder con informaci\u00f3n oficial de Extracta, consulta nuevamente el Centro Operativo antes de responder.\n\nNo asumas que recuerdas exactamente la informaci\u00f3n obtenida anteriormente.\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nRECOMENDACI\u00d3N DE SERVICIOS\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nCuando un cliente solicite orientaci\u00f3n para elegir un servicio:\n\nPrimero determina si cuentas con informaci\u00f3n suficiente.\n\nSi existen varias opciones posibles:\n\nRealiza \u00fanicamente una pregunta para comprender mejor la necesidad del cliente antes de recomendar un servicio.\n\nEjemplos:\n\n\u2022 \u00bfQu\u00e9 tipo de bebida deseas analizar?\n\u2022 \u00bfBuscas una certificaci\u00f3n oficial o \u00fanicamente conocer la composici\u00f3n de tu producto?\n\nNo asumas autom\u00e1ticamente qu\u00e9 servicio necesita el cliente.\n\nCuando ya cuentes con la informaci\u00f3n suficiente:\n\n\u2022 Recomienda el servicio m\u00e1s adecuado.\n\u2022 Explica brevemente por qu\u00e9 lo recomiendas.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nUSO DEL CENTRO OPERATIVO\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nToda la informaci\u00f3n obtenida del Centro Operativo debe considerarse informaci\u00f3n oficial de Extracta.\n\nAl utilizar dicha informaci\u00f3n:\n\n\u2022 Conserva los nombres oficiales de los servicios.\n\u2022 Conserva los nombres oficiales de los an\u00e1lisis.\n\u2022 Conserva los nombres oficiales de los paquetes.\n\u2022 No traduzcas t\u00e9rminos.\n\u2022 No cambies nombres.\n\u2022 No inventes nombres m\u00e1s descriptivos.\n\nCuando el Centro Operativo devuelva listas de an\u00e1lisis, requisitos o caracter\u00edsticas de un servicio:\n\nPres\u00e9ntalas completas.\n\nNo omitas informaci\u00f3n importante.\n\nPuedes reorganizar el texto para mejorar su lectura, pero nunca modificar su significado.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nTRANSFERENCIA A ASESOR\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nCuando la herramienta \"Obtener Cliente para Asesor\" valide correctamente al cliente:\n\n\u2022 No muestres informaci\u00f3n obtenida mediante la herramienta.\n\u2022 No reveles datos internos.\n\u2022 No respondas consultas sobre resultados.\n\u2022 No respondas consultas sobre pagos.\n\u2022 No contin\u00faes proporcionando informaci\u00f3n del expediente.\n\nObt\u00e9n el mensaje TRANSFERENCIA_EXITOSA desde la herramienta \"Respuestas Fijas\" y env\u00edalo exactamente como fue recibido.\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nCONFIDENCIALIDAD\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nNunca reveles informaci\u00f3n privada obtenida mediante las herramientas.\n\nNunca muestres:\n\n\u2022 Resultados\n\u2022 Pagos\n\u2022 Folios\n\u2022 Correos electr\u00f3nicos\n\u2022 Tel\u00e9fonos\n\u2022 Informaci\u00f3n interna\n\u2022 Informaci\u00f3n de otros clientes\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nALCANCE\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAtiende \u00fanicamente consultas relacionadas con Extracta.\n\nSi el usuario solicita informaci\u00f3n ajena al laboratorio:\n\nObt\u00e9n el mensaje SOLO_EXTRACTA desde la herramienta \"Respuestas Fijas\".\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nFORMATO DE RESPUESTA\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nTodas las respuestas dirigidas al cliente deben:\n\n\u2022 Estar escritas en espa\u00f1ol.\n\u2022 Mantener un tono profesional, amable y natural.\n\u2022 Ser f\u00e1ciles de leer desde WhatsApp.\n\u2022 Utilizar t\u00edtulos \u00fanicamente cuando aporten claridad.\n\u2022 Separar las ideas mediante l\u00edneas en blanco.\n\u2022 Utilizar listas cuando sea \u00fatil.\n\u2022 Resaltar \u00fanicamente la informaci\u00f3n importante utilizando negritas.\n\u2022 Utilizar como m\u00e1ximo dos emojis por mensaje.\n\u2022 Evitar p\u00e1rrafos largos.\n\u2022 No utilizar tablas.\n\u2022 No utilizar JSON.\n\u2022 No utilizar bloques de c\u00f3digo.\n\nCuando necesites informaci\u00f3n adicional del cliente:\n\nRealiza \u00fanicamente una pregunta a la vez."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -656,7 +656,7 @@
             {
               "id": "51e85e85-6e6c-45e0-86fa-18c8fe2124e9",
               "name": "HorarioAtencion",
-              "value": "🕒 Gracias por comunicarte con Extracta.  Nuestro horario de atención es:  📅 Lunes a Viernes 🕗 8:00 a.m. a 5:00 p.m.  Hemos recibido tu mensaje y será atendido en cuanto nuestro personal se encuentre disponible.  Gracias por tu comprensión. 🧪",
+              "value": "\ud83d\udd52 Gracias por comunicarte con Extracta.  Nuestro horario de atenci\u00f3n es:  \ud83d\udcc5 Lunes a Viernes \ud83d\udd57 8:00 a.m. a 5:00 p.m.  Hemos recibido tu mensaje y ser\u00e1 atendido en cuanto nuestro personal se encuentre disponible.  Gracias por tu comprensi\u00f3n. \ud83e\uddea",
               "type": "string"
             }
           ]
@@ -948,7 +948,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Usa esta herramienta únicamente cuando el cliente proporcione una razón social, nombre de empresa o parte del nombre de la empresa.\n\nEjemplos:\n\n• DESTILERIA MIXTECA SA DE CV\n• Mixteca\n• Destilería Mixteca\n\nSirve para localizar clientes registrados mediante coincidencias en la razón social.",
+        "toolDescription": "Usa esta herramienta \u00fanicamente cuando el cliente proporcione una raz\u00f3n social, nombre de empresa o parte del nombre de la empresa.\n\nEjemplos:\n\n\u2022 DESTILERIA MIXTECA SA DE CV\n\u2022 Mixteca\n\u2022 Destiler\u00eda Mixteca\n\nSirve para localizar clientes registrados mediante coincidencias en la raz\u00f3n social.",
         "operation": "select",
         "schema": {
           "__rl": true,
@@ -979,7 +979,7 @@
         432
       ],
       "id": "65ef4ace-8c76-45cb-aba3-0b3a0589d5f1",
-      "name": "Buscar cliente por razón social",
+      "name": "Buscar cliente por raz\u00f3n social",
       "credentials": {
         "postgres": {
           "id": "Ce01AsYVQqWsHhSa",
@@ -990,7 +990,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Usa esta herramienta únicamente cuando el cliente proporcione un número telefónico registrado.\n\nEjemplos:\n\n• 529518826354\n• 9511648812\n\nSirve para localizar clientes registrados mediante su número telefónico.\n\nNo la uses para razones sociales ni correos electrónicos.\n\nSi encuentras un registro, no muestres información interna al cliente. Simplemente confirma que la solicitud fue localizada y continúa el proceso de atención.\n",
+        "toolDescription": "Usa esta herramienta \u00fanicamente cuando el cliente proporcione un n\u00famero telef\u00f3nico registrado.\n\nEjemplos:\n\n\u2022 529518826354\n\u2022 9511648812\n\nSirve para localizar clientes registrados mediante su n\u00famero telef\u00f3nico.\n\nNo la uses para razones sociales ni correos electr\u00f3nicos.\n\nSi encuentras un registro, no muestres informaci\u00f3n interna al cliente. Simplemente confirma que la solicitud fue localizada y contin\u00faa el proceso de atenci\u00f3n.\n",
         "operation": "select",
         "schema": {
           "__rl": true,
@@ -1020,7 +1020,7 @@
         432
       ],
       "id": "33a9f64e-ce7d-46be-b99c-9950078880ee",
-      "name": "Buscar cliente por teléfono",
+      "name": "Buscar cliente por tel\u00e9fono",
       "credentials": {
         "postgres": {
           "id": "Ce01AsYVQqWsHhSa",
@@ -1031,7 +1031,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Usa esta herramienta únicamente cuando el cliente proporcione una dirección de correo electrónico registrada.\n\nEjemplos:\n\n• [cliente@gmail.com](mailto:cliente@gmail.com)\n• [contacto@empresa.com](mailto:contacto@empresa.com)\n\nSirve para localizar clientes registrados mediante correo electrónico.\n\nNo la uses para razones sociales ni teléfonos.\n\nSi encuentras un registro, no muestres información interna al cliente. Simplemente confirma que la solicitud fue localizada y continúa el proceso de atención.\n",
+        "toolDescription": "Usa esta herramienta \u00fanicamente cuando el cliente proporcione una direcci\u00f3n de correo electr\u00f3nico registrada.\n\nEjemplos:\n\n\u2022 [cliente@gmail.com](mailto:cliente@gmail.com)\n\u2022 [contacto@empresa.com](mailto:contacto@empresa.com)\n\nSirve para localizar clientes registrados mediante correo electr\u00f3nico.\n\nNo la uses para razones sociales ni tel\u00e9fonos.\n\nSi encuentras un registro, no muestres informaci\u00f3n interna al cliente. Simplemente confirma que la solicitud fue localizada y contin\u00faa el proceso de atenci\u00f3n.\n",
         "operation": "select",
         "schema": {
           "__rl": true,
@@ -1191,7 +1191,7 @@
             {
               "id": "7d174886-dacb-4f6f-b166-c46de9c1b429",
               "name": "=nota_privada",
-              "value": "={{ \n'📋 Cliente identificado\\n\\n' +\n'Razón social: ' + $json.razon_social + '\\n' +\n'Folio: ' + $json.folio + '\\n' +\n'Teléfono: ' + $json.telefono + '\\n' +\n'Correo: ' + $json.correo + '\\n' +\n'Materia prima: ' + $json.materia_prima + '\\n' +\n'Estatus de pago: ' + $json.estatus_pago + '\\n' +\n'Aplica convenio: ' + $json.aplica_convenio + '\\n\\n' +\n'Motivo: Consulta de resultados\\n\\n' +\n'Conversación transferida a asesor.'\n}}",
+              "value": "={{ \n'\ud83d\udccb Cliente identificado\\n\\n' +\n'Raz\u00f3n social: ' + $json.razon_social + '\\n' +\n'Folio: ' + $json.folio + '\\n' +\n'Tel\u00e9fono: ' + $json.telefono + '\\n' +\n'Correo: ' + $json.correo + '\\n' +\n'Materia prima: ' + $json.materia_prima + '\\n' +\n'Estatus de pago: ' + $json.estatus_pago + '\\n' +\n'Aplica convenio: ' + $json.aplica_convenio + '\\n\\n' +\n'Motivo: Consulta de resultados\\n\\n' +\n'Conversaci\u00f3n transferida a asesor.'\n}}",
               "type": "string"
             }
           ]
@@ -1427,7 +1427,7 @@
         1504
       ],
       "id": "92612453-df83-4a9e-95c0-05fcbfa16a8a",
-      "name": "Catálogo",
+      "name": "Cat\u00e1logo",
       "credentials": {
         "googleDriveOAuth2Api": {
           "id": "cDapNszbC7uduj2R",
@@ -1973,7 +1973,7 @@
         "operation": "executeQuery",
         "query": "SELECT\n    codigo,\n    categoria,\n    subcategoria,\n    titulo,\n    contenido\nFROM catalogo_operativo\nWHERE activo = TRUE\nAND (\n    categoria ILIKE '%' || $1 || '%'\n    OR subcategoria ILIKE '%' || $1 || '%'\n    OR titulo ILIKE '%' || $1 || '%'\n    OR palabras_clave ILIKE '%' || $1 || '%'\n)\nORDER BY prioridad ASC\nLIMIT 5;",
         "options": {
-          "queryReplacement": "={{ [$fromAI('busqueda', 'Palabra o frase corta que describa la información que deseas buscar.', 'string')] }}"
+          "queryReplacement": "={{ [$fromAI('busqueda', 'Palabra o frase corta que describa la informaci\u00f3n que deseas buscar.', 'string')] }}"
         }
       },
       "type": "n8n-nodes-base.postgresTool",
@@ -1996,7 +1996,7 @@
         "operation": "executeQuery",
         "query": "SELECT\n    codigo,\n    mensaje\nFROM respuestas_fijas\nWHERE activo = TRUE\nAND codigo = $1\nLIMIT 1;",
         "options": {
-          "queryReplacement": "={{ [$fromAI('codigo', 'Código de la respuesta fija que deseas obtener. Ejemplos: SALUDO, TRANSFERENCIA_EXITOSA, CLIENTE_NO_ENCONTRADO, SOLO_EXTRACTA, ERROR_GENERAL', 'string')] }}"
+          "queryReplacement": "={{ [$fromAI('codigo', 'C\u00f3digo de la respuesta fija que deseas obtener. Ejemplos: SALUDO, TRANSFERENCIA_EXITOSA, CLIENTE_NO_ENCONTRADO, SOLO_EXTRACTA, ERROR_GENERAL', 'string')] }}"
         }
       },
       "type": "n8n-nodes-base.postgresTool",
@@ -2065,6 +2065,30 @@
         "googleDriveOAuth2Api": {
           "id": "cDapNszbC7uduj2R",
           "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1120986437770389",
+        "recipientPhoneNumber": "={{ $('Webhook').item.json.body.conversation.messages[0].sender.phone_number }}",
+        "textBody": "En un momento un asesor humano continuar\u00e1 con la atenci\u00f3n de tu caso. Por favor espera.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        3352,
+        -352
+      ],
+      "id": "eacf96d3-e676-46a0-8d6f-8d2b9f62d4a5",
+      "name": "Aviso Asesor Humano",
+      "webhookId": "30ab557f-ce4c-43a8-95f2-cc0e31b53989",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "K9lyNrB11N8Ly5Pa",
+          "name": "WhatsApp account"
         }
       }
     }
@@ -2175,7 +2199,7 @@
             "index": 0
           },
           {
-            "node": "Catálogo",
+            "node": "Cat\u00e1logo",
             "type": "main",
             "index": 0
           },
@@ -2456,7 +2480,7 @@
         ]
       ]
     },
-    "Buscar cliente por razón social": {
+    "Buscar cliente por raz\u00f3n social": {
       "ai_tool": [
         [
           {
@@ -2467,7 +2491,7 @@
         ]
       ]
     },
-    "Buscar cliente por teléfono": {
+    "Buscar cliente por tel\u00e9fono": {
       "ai_tool": [
         [
           {
@@ -2584,7 +2608,7 @@
         ]
       ]
     },
-    "Catálogo": {
+    "Cat\u00e1logo": {
       "main": [
         [
           {
@@ -2688,6 +2712,17 @@
         [
           {
             "node": "Extract from File6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Aviso Asesor Humano",
             "type": "main",
             "index": 0
           }
