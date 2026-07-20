@@ -1,6 +1,6 @@
 # Workflows de n8n
 
-El repositorio incluye [un workflow de ejemplo saneado](../workflows/My%20workflow%202.json). Se entrega desactivado y sin credenciales asignadas.
+El repositorio incluye [un workflow de ejemplo saneado](../workflows/My%20workflow%201.json). Se entrega desactivado y sin credenciales asignadas.
 
 ## Dependencias
 
@@ -32,11 +32,12 @@ flowchart TD
     J --> K
     K --> L[Agrupar mensajes]
     L --> M{Horario de atención}
-    M -->|Fuera| N[Mensaje informativo]
+    M -->|Fuera| N[Mensaje informativo de horario + Nota en Chatwoot]
     M -->|Dentro| O[Agente de IA]
     O --> P{Tipo de respuesta}
-    P -->|Texto| Q[Enviar mensaje]
+    P -->|Texto| Q[Enviar mensaje de IA]
     P -->|Precio| R[Enviar imagen]
+    O -->|Error/Fallo IA| S[Error Trigger: Enviar mensaje técnico]
 ```
 
 ## Reglas importantes
@@ -59,29 +60,29 @@ buffer:<account_id>:<conversation_id>
 
 El workflow actual debe probarse con mensajes simultáneos antes de aumentar tráfico.
 
-### Horario
+### Horario y Fuera de Horario
 
-La regla usa `America/Mexico_City`, de lunes a viernes, de 08:00 a 16:59. Los días festivos no están modelados.
+La regla de horario usa `America/Mexico_City`, de lunes a viernes, de 08:00 a 16:59.
+* Si el cliente escribe fuera de horario: se le envía su mensaje respectivo de WhatsApp y **se genera una nota privada automática en Chatwoot** para alertar a los asesores del intento de contacto al día siguiente.
 
-### Agente
+### Agente de IA
 
 El agente:
 
-- mantiene una ventana de contexto de 10 mensajes;
+- mantiene una ventana de contexto de 20 mensajes;
 - consulta `bd_clientes` cuando recibe un folio;
 - devuelve claves especiales para seleccionar imágenes;
 - no debe inventar precios, resultados ni estados.
 
-## Sincronización de datos
+### Manejo de Errores (Resiliencia)
 
-El mismo archivo contiene una rama que observa un XLSX de Google Drive (Centro Operativo):
+El flujo cuenta con un nodo `Error Trigger` global. Si el proveedor de IA (OpenAI) experimenta fallos o timeouts, el bot envía automáticamente un mensaje de disculpa al cliente para no dejarlo sin respuesta, protegiendo la experiencia de usuario.
 
-1. detecta cambios en el archivo matriz;
-2. descarga el archivo;
-3. extrae las filas de múltiples hojas (`Clientes`, `Catalogo_Operativo`, `Intenciones`, `Respuestas_Fijas`, `Configuracion`);
-4. ejecuta un `upsert` en sus respectivas tablas en PostgreSQL.
+### Optimización de Base de Datos y Redis
 
-Esto convierte a la base de datos en la principal fuente de conocimiento oficial para el agente. El rediseño del Centro Operativo organiza la información por categorías, mejorando las búsquedas y separando la configuración institucional del prompt principal.
+* **Sincronización Consolidada:** Se utiliza un único `Google Drive Trigger` que centraliza la carga y actualización de todas las tablas de negocio en PostgreSQL, evitando ejecuciones y duplicaciones de procesamiento.
+* **Payload Redis Limpio:** El nodo `Code in JavaScript2` procesa y filtra el payload de Chatwoot antes de guardarlo en Redis. En lugar de almacenar todo el objeto completo (que incluye metadatos extensos de la cuenta), solo guarda la estructura básica (`phone`, `content`, `attachments`). Esto ahorra hasta un 90% de almacenamiento en la memoria del buffer.
+* **Límite de Catálogo Extendido:** La herramienta `Centro Operativo` ejecuta consultas SQL con `LIMIT 15` (antes 5), permitiendo que la IA analice un espectro de conocimiento más amplio y preciso a medida que el catálogo de análisis crece.
 
 ## Importación segura
 
@@ -99,4 +100,5 @@ Esto convierte a la base de datos en la principal fuente de conocimiento oficial
 - El webhook depende del payload de Chatwoot.
 - La versión de Graph API debe actualizarse de forma planificada.
 - Las variables `$env` pueden estar restringidas según la configuración o versión de n8n; si ocurre, usa credenciales o variables administradas desde n8n.
-- No existe todavía un workflow separado de manejo global de errores.
+- Se implementó un control local de errores para la IA, pero se recomienda estructurar un flujo global secundario para fallos generales del servidor n8n.
+
